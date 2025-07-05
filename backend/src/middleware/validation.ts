@@ -94,6 +94,47 @@ export const validateUserLogin: ValidationChain[] = [
 ];
 
 /**
+ * User profile update validation
+ */
+export const validateUserUpdate: ValidationChain[] = [
+  body('name')
+    .optional()
+    .isLength({ min: 2, max: 50 })
+    .withMessage('Name must be between 2 and 50 characters')
+    .matches(/^[a-zA-Z\s\u00C0-\u017F]+$/)
+    .withMessage('Name can only contain letters and spaces'),
+
+  body('email')
+    .optional()
+    .isEmail()
+    .withMessage('Please provide a valid email')
+    .normalizeEmail()
+    .isLength({ max: 100 })
+    .withMessage('Email cannot exceed 100 characters'),
+
+  body('currentPassword')
+    .optional()
+    .notEmpty()
+    .withMessage('Current password is required when changing password')
+    .isLength({ max: 128 })
+    .withMessage('Password is too long'),
+
+  body('newPassword')
+    .optional()
+    .isLength({ min: SECURITY_CONFIG.PASSWORD_MIN_LENGTH })
+    .withMessage(`Password must be at least ${SECURITY_CONFIG.PASSWORD_MIN_LENGTH} characters long`)
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character')
+    .isLength({ max: 128 })
+    .withMessage('Password is too long'),
+
+  body('confirmation')
+    .optional()
+    .equals('DELETE')
+    .withMessage('Confirmation must be exactly "DELETE"')
+];
+
+/**
  * URL creation validation
  */
 export const validateUrlCreation: ValidationChain[] = [

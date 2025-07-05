@@ -89,3 +89,7 @@ prisma/migrations/
 
 # Vercel
 .vercel
+
+# Project documentation (private)
+proyecto.md
+diagram.md

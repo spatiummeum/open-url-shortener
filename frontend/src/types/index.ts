@@ -2,11 +2,13 @@ export interface User {
   id: string;
   email: string;
   name: string | null;
-  plan: 'FREE' | 'PRO' | 'ENTERPRISE';
+  plan: 'FREE' | 'PRO' | 'BUSINESS' | 'ENTERPRISE';
   isActive: boolean;
   isVerified: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  lastLogin?: string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  bio?: string;
 }
 
 export interface Url {
@@ -21,6 +23,8 @@ export interface Url {
   domainId: string | null;
   createdAt: Date;
   updatedAt: Date;
+  shortUrl?: string;
+  hasPassword?: boolean;
 }
 
 export interface Click {
@@ -56,8 +60,11 @@ export interface Domain {
   domain: string;
   userId: string;
   isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  _count?: {
+    urls: number;
+  };
 }
 
 export interface AuthTokens {
@@ -68,8 +75,13 @@ export interface AuthTokens {
 export interface AuthResponse {
   message: string;
   user: Omit<User, 'password'>;
-  accessToken: string;
-  refreshToken: string;
+  tokens: AuthTokens;
+}
+
+export interface LoginResponse {
+  message: string;
+  user: User;
+  tokens: AuthTokens;
 }
 
 export interface ApiResponse<T = any> {

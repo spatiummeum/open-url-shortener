@@ -9,6 +9,10 @@ import authRoutes from './routes/auth';
 import urlRoutes from './routes/urls';
 import healthRoutes from './routes/health';
 import redirectRoutes from './routes/redirects';
+import analyticsRoutes from './routes/analytics';
+import usersRoutes from './routes/users';
+import domainsRoutes from './routes/domains';
+import webhooksRoutes from './routes/webhooks';
 
 // Load environment variables
 dotenv.config();
@@ -33,6 +37,10 @@ app.set('trust proxy', 1);
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/urls', urlRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/domains', domainsRoutes);
+app.use('/api/webhooks', webhooksRoutes);
 
 // URL redirect route (should be last)
 app.use('/', redirectRoutes);
@@ -53,11 +61,13 @@ app.use('*', (req: express.Request, res: express.Response) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
-});
+// Only start server if this file is run directly
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
+  });
+}
 
 export default app;

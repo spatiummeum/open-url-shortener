@@ -237,4 +237,103 @@ router.post('/login',
   }
 );
 
+/**
+ * Refresh access token
+ * POST /auth/refresh
+ */
+router.post('/refresh',
+  rateLimitModerate,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { refreshToken } = req.body;
+
+      if (!refreshToken) {
+        res.status(HTTP_STATUS.BAD_REQUEST).json({
+          error: 'Refresh token is required'
+        });
+        return;
+      }
+
+      // Verify refresh token
+      let decoded: any;
+      try {
+        decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!);
+      } catch (error) {
+        res.status(HTTP_STATUS.UNAUTHORIZED).json({
+          error: 'Invalid refresh token'
+        });
+        return;
+      }
+
+      // Check if refresh token exists in database
+      const storedToken = await prisma.refreshToken.findUnique({
+        where: { token: refreshToken },
+        include: { user: true }
+      });
+
+      if (!storedToken) {
+        res.status(HTTP_STATUS.UNAUTHORIZED).json({
+          error: 'Refresh token not found'
+        });
+        return;
+      }
+
+      // Check if token is expired
+      if (new Date() > storedToken.expiresAt) {
+        // Delete expired token
+        await prisma.refreshToken.delete({
+          where: { token: refreshToken }
+        });
+
+        res.status(HTTP_STATUS.UNAUTHORIZED).json({
+          error: 'Refresh token expired'
+        });
+        return;
+      }
+
+      // Check if user is still active
+      if (!storedToken.user.isActive) {
+        res.status(HTTP_STATUS.UNAUTHORIZED).json({
+          error: 'User account is inactive'
+        });
+        return;
+      }
+
+      // Generate new tokens
+      const { accessToken, refreshToken: newRefreshToken } = generateTokens(storedToken.userId);
+
+      // Delete old refresh token and create new one
+      await prisma.$transaction([
+        prisma.refreshToken.delete({
+          where: { token: refreshToken }
+        }),
+        prisma.refreshToken.create({
+          data: {
+            token: newRefreshToken,
+            userId: storedToken.userId,
+            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+          }
+        })
+      ]);
+
+      res.json({
+        accessToken,
+        refreshToken: newRefreshToken,
+        user: {
+          id: storedToken.user.id,
+          email: storedToken.user.email,
+          name: storedToken.user.name,
+          plan: storedToken.user.plan
+        }
+      });
+
+    } catch (error) {
+      console.error('Refresh token error:', error);
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+        error: 'Internal server error'
+      });
+    }
+  }
+);
+
 export default router;

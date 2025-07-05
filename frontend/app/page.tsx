@@ -1,6 +1,37 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
+import { apiService } from '../src/services/apiService';
 
 export default function Home() {
+  const [url, setUrl] = useState('');
+  const [shortUrl, setShortUrl] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!url) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await apiService.post('/urls', { originalUrl: url });
+      setShortUrl(response.shortUrl);
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to shorten URL');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(shortUrl);
+    // You could add a toast notification here
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -18,16 +49,59 @@ export default function Home() {
 
           {/* Main CTA */}
           <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl mb-12">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <input
-                type="url"
-                placeholder="Enter your long URL here..."
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <button className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
-                Shorten URL
-              </button>
-            </div>
+            {error && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                {error}
+              </div>
+            )}
+            
+            {shortUrl ? (
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <input
+                    type="text"
+                    value={shortUrl}
+                    readOnly
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50"
+                  />
+                  <button
+                    onClick={copyToClipboard}
+                    className="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    Copy Link
+                  </button>
+                </div>
+                <button
+                  onClick={() => {
+                    setShortUrl('');
+                    setUrl('');
+                  }}
+                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                >
+                  Shorten another URL
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <input
+                    type="url"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="Enter your long URL here..."
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? 'Shortening...' : 'Shorten URL'}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
 
           {/* Features */}
