@@ -16,28 +16,36 @@ export const errorHandler = (
     userAgent: req.get('User-Agent'),
   });
 
+  // Si los headers ya fueron enviados, delegar al error handler por defecto de Express
+  if (res.headersSent) {
+    return next(err);
+  }
+
   // Error de validación
   if (err.name === 'ValidationError') {
-    return res.status(400).json({
+    res.status(400).json({
       error: 'Validation Error',
       details: err.details || err.message,
     });
+    return;
   }
 
   // Error de autenticación
   if (err.name === 'UnauthorizedError' || err.message === 'jwt malformed') {
-    return res.status(401).json({
+    res.status(401).json({
       error: 'Unauthorized',
       message: 'Invalid or missing authentication token',
     });
+    return;
   }
 
   // Error de base de datos
   if (err.code === 'P2002') {
-    return res.status(409).json({
+    res.status(409).json({
       error: 'Conflict',
       message: 'Resource already exists',
     });
+    return;
   }
 
   // Error genérico del servidor

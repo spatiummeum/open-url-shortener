@@ -101,9 +101,11 @@ router.get('/dashboard',
       });
 
       // Group by day
-      const dailyClicks = clicksOverTime.reduce((acc: any, click) => {
+      const dailyClicks = clicksOverTime.reduce((acc: Record<string, number>, click) => {
         const date = click.timestamp.toISOString().split('T')[0];
-        acc[date] = (acc[date] || 0) + (click._count || 0);
+        if (date) {
+          acc[date] = (acc[date] || 0) + (click._count?.id || 0);
+        }
         return acc;
       }, {});
 
@@ -278,7 +280,9 @@ router.get('/:urlId',
       // Group by date
       const clicksByDate: Record<string, number> = clicks.reduce((acc, click) => {
         const date = click.timestamp.toISOString().split('T')[0];
-        acc[date] = (acc[date] || 0) + 1;
+        if (date) {
+          acc[date] = (acc[date] || 0) + 1;
+        }
         return acc;
       }, {} as Record<string, number>);
 
@@ -426,7 +430,9 @@ router.get('/dashboard',
       // Group clicks by date
       const clicksByDate: Record<string, number> = clicksData.reduce((acc, click) => {
         const date = click.timestamp.toISOString().split('T')[0];
-        acc[date] = (acc[date] || 0) + 1;
+        if (date) {
+          acc[date] = (acc[date] || 0) + 1;
+        }
         return acc;
       }, {} as Record<string, number>);
 

@@ -285,7 +285,8 @@ export const validateDomain: ValidationChain[] = [
       }
       
       // TLD must be at least 2 characters
-      if (parts[parts.length - 1].length < 2) {
+      const tld = parts[parts.length - 1];
+      if (tld && tld.length < 2) {
         throw new Error('Top-level domain must be at least 2 characters');
       }
       

@@ -1,4 +1,5 @@
 import rateLimit from 'express-rate-limit';
+import { Request } from 'express';
 import { RATE_LIMIT_CONFIG } from '../utils/constants';
 
 /**
@@ -112,7 +113,7 @@ export const rateLimitURLCreation = rateLimit({
         return 10;
     }
   },
-  message: (req) => {
+  message: (req: Request) => {
     const user = (req as any).user;
     const planLimit = user ? 
       (user.plan === 'FREE' ? '50' : user.plan === 'PRO' ? '500' : '5000') : 
