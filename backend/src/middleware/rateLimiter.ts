@@ -6,11 +6,11 @@ import { RATE_LIMIT_CONFIG } from '../utils/constants';
  * Strict rate limiting for sensitive operations (login, register, password reset)
  */
 export const rateLimitStrict = rateLimit({
-  windowMs: RATE_LIMIT_CONFIG.STRICT.windowMs,
-  max: RATE_LIMIT_CONFIG.STRICT.max,
+  windowMs: process.env.NODE_ENV === 'development' ? 60 * 1000 : RATE_LIMIT_CONFIG.STRICT.windowMs, // 1 minute in dev
+  max: process.env.NODE_ENV === 'development' ? 20 : RATE_LIMIT_CONFIG.STRICT.max, // 20 requests in dev
   message: {
     error: 'Too many requests from this IP, please try again later.',
-    retryAfter: Math.ceil(RATE_LIMIT_CONFIG.STRICT.windowMs / 1000)
+    retryAfter: process.env.NODE_ENV === 'development' ? 60 : Math.ceil(RATE_LIMIT_CONFIG.STRICT.windowMs / 1000)
   },
   standardHeaders: true,
   legacyHeaders: false,

@@ -46,24 +46,34 @@ class ApiService {
           
           if (tokens?.refreshToken) {
             try {
-              const response = await this.api.post('/auth/refresh', {
+              // Create a new axios instance to avoid interceptor loops
+              const refreshResponse = await axios.post(`${API_BASE_URL}/auth/refresh`, {
                 refreshToken: tokens.refreshToken,
               });
 
-              const newTokens = response.data.tokens;
+              const { accessToken, refreshToken } = refreshResponse.data;
+              const newTokens = { accessToken, refreshToken };
+              
               updateTokens(newTokens);
 
               // Reintentar la petición original
-              originalRequest.headers.Authorization = `Bearer ${newTokens.accessToken}`;
+              if (originalRequest.headers) {
+                originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+              }
               return this.api(originalRequest);
             } catch (refreshError) {
+              console.error('Token refresh failed:', refreshError);
               logout();
-              window.location.href = '/login';
+              if (typeof window !== 'undefined') {
+                window.location.href = '/login';
+              }
               return Promise.reject(refreshError);
             }
           } else {
             logout();
-            window.location.href = '/login';
+            if (typeof window !== 'undefined') {
+              window.location.href = '/login';
+            }
           }
         }
 

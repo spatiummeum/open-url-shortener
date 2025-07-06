@@ -8,22 +8,23 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(cuid())
-  email          String          @unique
-  password       String
-  name           String?
-  plan           UserPlan        @default(FREE)
-  isActive       Boolean         @default(true)
-  isVerified     Boolean         @default(false)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  lastLogin      DateTime?
-  domains        Domain[]
-  loginAttempts  LoginAttempt[]
-  refreshTokens  RefreshToken[]
-  securityEvents SecurityEvent[]
-  subscription   Subscription?
-  urls           Url[]
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  password            String
+  name                String?
+  plan                UserPlan             @default(FREE)
+  isActive            Boolean              @default(true)
+  isVerified          Boolean              @default(false)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  lastLogin           DateTime?
+  domains             Domain[]
+  loginAttempts       LoginAttempt[]
+  passwordResetTokens PasswordResetToken[]
+  refreshTokens       RefreshToken[]
+  securityEvents      SecurityEvent[]
+  subscription        Subscription?
+  urls                Url[]
 
   @@map("users")
 }
@@ -37,6 +38,18 @@ model RefreshToken {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("refresh_tokens")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
 }
 
 model Subscription {
