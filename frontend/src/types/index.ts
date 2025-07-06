@@ -105,3 +105,109 @@ export interface PaginationResponse<T> {
     totalPages: number;
   };
 }
+
+// Analytics interfaces
+export interface AnalyticsSummary {
+  totalUrls: number;
+  totalClicks: number;
+  uniqueClicks: number;
+  clicksInPeriod: number;
+  avgClicksPerUrl: number;
+  clickRate: number;
+}
+
+export interface ClicksOverTime {
+  date: string;
+  clicks: number;
+  uniqueClicks: number;
+}
+
+export interface TopUrl {
+  id: string;
+  shortCode: string;
+  title: string;
+  originalUrl: string;
+  clicks: number;
+  uniqueClicks: number;
+  createdAt: Date | string;
+}
+
+export interface GeoData {
+  country: string;
+  city?: string;
+  clicks: number;
+  percentage: number;
+}
+
+export interface DeviceData {
+  device: string;
+  clicks: number;
+  percentage: number;
+}
+
+export interface BrowserData {
+  browser: string;
+  version?: string;
+  clicks: number;
+  percentage: number;
+}
+
+export interface ReferrerData {
+  referrer: string;
+  domain: string;
+  clicks: number;
+  percentage: number;
+}
+
+export interface PeriodComparison {
+  current: number;
+  previous: number;
+  change: number;
+  changePercentage: number;
+}
+
+export interface DashboardAnalytics {
+  summary: AnalyticsSummary;
+  comparison: {
+    clicks: PeriodComparison;
+    uniqueClicks: PeriodComparison;
+    urls: PeriodComparison;
+  };
+  charts: {
+    clicksOverTime: ClicksOverTime[];
+    topUrls: TopUrl[];
+    topCountries: GeoData[];
+    topCities: GeoData[];
+    topReferrers: ReferrerData[];
+    topDevices: DeviceData[];
+    topBrowsers: BrowserData[];
+  };
+}
+
+export interface UrlAnalytics {
+  url: {
+    id: string;
+    shortCode: string;
+    originalUrl: string;
+    title?: string;
+    createdAt: Date | string;
+  };
+  summary: {
+    totalClicks: number;
+    uniqueClicks: number;
+    avgClicksPerDay: number;
+    peakDay: { date: string; clicks: number };
+    firstClick?: Date | string;
+    lastClick?: Date | string;
+  };
+  charts: {
+    clicksOverTime: ClicksOverTime[];
+    topCountries: GeoData[];
+    topCities: GeoData[];
+    topReferrers: ReferrerData[];
+    topDevices: DeviceData[];
+    topBrowsers: BrowserData[];
+    hourlyDistribution: { hour: number; clicks: number }[];
+    weeklyDistribution: { day: string; clicks: number }[];
+  };
+}

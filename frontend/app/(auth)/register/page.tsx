@@ -44,7 +44,14 @@ export default function RegisterPage() {
 
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Registration failed');
+      // Handle validation errors more specifically
+      if (err.response?.status === 400 && err.response?.data?.errors) {
+        // If we have validation errors, show them
+        const validationErrors = err.response.data.errors;
+        setError(validationErrors.map((error: any) => error.msg).join(', '));
+      } else {
+        setError(err.response?.data?.error || 'Registration failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -117,6 +124,21 @@ export default function RegisterPage() {
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Enter your password"
           />
+          <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-xs font-medium text-blue-800 mb-2">Password Requirements:</p>
+            <ul className="text-xs text-blue-700 space-y-1">
+              <li>• At least 8 characters long</li>
+              <li>• At least one uppercase letter (A-Z)</li>
+              <li>• At least one lowercase letter (a-z)</li>
+              <li>• At least one number (0-9)</li>
+              <li>• At least one special character (!@#$%^&*)</li>
+              <li>• Cannot be a common password (password, 123456, etc.)</li>
+              <li>• Cannot have more than 3 repeated characters</li>
+            </ul>
+            <p className="text-xs text-blue-600 mt-2 font-medium">
+              Example: <code className="bg-blue-100 px-1 rounded">TestPass123!</code>
+            </p>
+          </div>
         </div>
 
         <div>
