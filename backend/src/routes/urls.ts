@@ -371,6 +371,78 @@ router.put('/:id',
 );
 
 /**
+ * Verify password for protected URL
+ * POST /urls/verify-password/:shortCode
+ */
+router.post('/verify-password/:shortCode',
+  rateLimitLenient,
+  sanitizeInput,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { shortCode } = req.params;
+      const { password } = req.body;
+
+      if (!password) {
+        res.status(HTTP_STATUS.BAD_REQUEST).json({
+          error: 'Password is required'
+        });
+        return;
+      }
+
+      const url = await prisma.url.findFirst({
+        where: { 
+          shortCode,
+          isActive: true,
+          OR: [
+            { expiresAt: null },
+            { expiresAt: { gt: new Date() } }
+          ]
+        },
+        select: {
+          id: true,
+          originalUrl: true,
+          password: true
+        }
+      });
+
+      if (!url) {
+        res.status(HTTP_STATUS.NOT_FOUND).json({
+          error: 'URL not found or expired'
+        });
+        return;
+      }
+
+      if (!url.password) {
+        res.status(HTTP_STATUS.BAD_REQUEST).json({
+          error: 'URL is not password protected'
+        });
+        return;
+      }
+
+      const isValidPassword = await bcrypt.compare(password, url.password);
+
+      if (!isValidPassword) {
+        res.status(HTTP_STATUS.UNAUTHORIZED).json({
+          error: 'Invalid password'
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        originalUrl: url.originalUrl
+      });
+
+    } catch (error) {
+      console.error('Password verification error:', error);
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+        error: 'Internal server error'
+      });
+    }
+  }
+);
+
+/**
  * Delete URL
  * DELETE /urls/:id
  */

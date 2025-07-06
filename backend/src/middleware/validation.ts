@@ -205,6 +205,19 @@ export const validateUrlCreation: ValidationChain[] = [
     .withMessage(`Description cannot exceed ${URL_CONFIG.MAX_DESCRIPTION_LENGTH} characters`)
     .escape(), // Sanitize HTML
     
+  body('password')
+    .optional()
+    .trim()
+    .isLength({ min: 4, max: 50 })
+    .withMessage('Password must be between 4 and 50 characters')
+    .custom((value: string) => {
+      // Basic password validation for URL protection
+      if (value && value.length < 4) {
+        throw new Error('Password must be at least 4 characters long');
+      }
+      return true;
+    }),
+    
   body('expiresAt')
     .optional()
     .isISO8601()

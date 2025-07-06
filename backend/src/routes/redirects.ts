@@ -58,10 +58,9 @@ router.get('/:shortCode',
       // Check password if required
       if (url.password) {
         if (!password) {
-          res.status(HTTP_STATUS.UNAUTHORIZED).json({
-            error: 'Password required',
-            requiresPassword: true
-          });
+          // Redirect to frontend password page instead of returning JSON
+          const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+          res.redirect(`${frontendUrl}/protected/${shortCode}`);
           return;
         }
 
