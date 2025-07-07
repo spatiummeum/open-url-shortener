@@ -73,8 +73,8 @@ export const validateUserRegistration: ValidationChain[] = [
     .trim()
     .isLength({ min: 2, max: 50 })
     .withMessage('Name must be between 2 and 50 characters')
-    .matches(/^[a-zA-Z\s]+$/)
-    .withMessage('Name can only contain letters and spaces')
+    .matches(/^[a-zA-Z\\s\\u00C0-\\u017F]+$/)
+    .withMessage('Name can only contain letters, spaces, and accented characters')
 ];
 
 /**
@@ -123,7 +123,7 @@ export const validateUserUpdate: ValidationChain[] = [
     .optional()
     .isLength({ min: SECURITY_CONFIG.PASSWORD_MIN_LENGTH })
     .withMessage(`Password must be at least ${SECURITY_CONFIG.PASSWORD_MIN_LENGTH} characters long`)
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/)
     .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character')
     .isLength({ max: 128 })
     .withMessage('Password is too long'),

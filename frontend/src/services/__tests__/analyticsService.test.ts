@@ -114,6 +114,19 @@ describe('Analytics Service', () => {
       clear: jest.fn()
     };
     Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+
+    // Mock download related globals
+    global.URL.createObjectURL = jest.fn(() => 'blob:mock-url');
+    global.URL.revokeObjectURL = jest.fn();
+    const mockAnchor = {
+      href: '',
+      download: '',
+      click: jest.fn(),
+      style: { display: '' }
+    };
+    jest.spyOn(document, 'createElement').mockReturnValue(mockAnchor as any);
+    jest.spyOn(document.body, 'appendChild').mockImplementation();
+    jest.spyOn(document.body, 'removeChild').mockImplementation();
   });
 
   describe('getDashboardAnalytics', () => {
@@ -222,23 +235,7 @@ describe('Analytics Service', () => {
         blob: async () => mockBlob
       } as Response);
 
-      // Mock URL.createObjectURL and URL.revokeObjectURL
-      const mockUrl = 'blob:http://localhost/mock-url';
-      global.URL.createObjectURL = jest.fn(() => mockUrl);
-      global.URL.revokeObjectURL = jest.fn();
-
-      // Mock document.createElement and click
-      const mockAnchor = {
-        href: '',
-        download: '',
-        click: jest.fn(),
-        style: { display: '' }
-      };
-      jest.spyOn(document, 'createElement').mockReturnValue(mockAnchor as any);
-      jest.spyOn(document.body, 'appendChild').mockImplementation();
-      jest.spyOn(document.body, 'removeChild').mockImplementation();
-
-      await analyticsService.exportAnalytics();
+      const result = await analyticsService.exportAnalytics();
 
       expect(mockFetch).toHaveBeenCalledWith(
         'http://localhost:3001/api/analytics/dashboard/export?period=30d',
@@ -251,10 +248,8 @@ describe('Analytics Service', () => {
         }
       );
 
-      expect(global.URL.createObjectURL).toHaveBeenCalledWith(mockBlob);
-      expect(mockAnchor.download).toContain('dashboard_analytics_');
-      expect(mockAnchor.click).toHaveBeenCalled();
-      expect(global.URL.revokeObjectURL).toHaveBeenCalledWith(mockUrl);
+      expect(result).toBe(mockBlob);
+      expect(result.type).toBe('text/csv');
     });
 
     it('should export URL analytics with correct filename', async () => {
@@ -264,27 +259,15 @@ describe('Analytics Service', () => {
         blob: async () => mockBlob
       } as Response);
 
-      global.URL.createObjectURL = jest.fn(() => 'blob:mock-url');
-      global.URL.revokeObjectURL = jest.fn();
-
-      const mockAnchor = {
-        href: '',
-        download: '',
-        click: jest.fn(),
-        style: { display: '' }
-      };
-      jest.spyOn(document, 'createElement').mockReturnValue(mockAnchor as any);
-      jest.spyOn(document.body, 'appendChild').mockImplementation();
-      jest.spyOn(document.body, 'removeChild').mockImplementation();
-
-      await analyticsService.exportAnalytics('url-123', '7d');
+      const result = await analyticsService.exportAnalytics('url-123', '7d');
 
       expect(mockFetch).toHaveBeenCalledWith(
         'http://localhost:3001/api/analytics/url-123/export?period=7d',
         expect.any(Object)
       );
 
-      expect(mockAnchor.download).toContain('url_analytics_url-123_');
+      expect(result).toBe(mockBlob);
+      expect(result.type).toBe('text/csv');
     });
 
     it('should handle export errors', async () => {

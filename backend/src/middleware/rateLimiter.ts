@@ -7,7 +7,7 @@ import { RATE_LIMIT_CONFIG } from '../utils/constants';
  */
 export const rateLimitStrict = rateLimit({
   windowMs: process.env.NODE_ENV === 'development' ? 60 * 1000 : RATE_LIMIT_CONFIG.STRICT.windowMs, // 1 minute in dev
-  max: process.env.NODE_ENV === 'development' ? 20 : RATE_LIMIT_CONFIG.STRICT.max, // 20 requests in dev
+  max: process.env.NODE_ENV === 'development' ? 100 : RATE_LIMIT_CONFIG.STRICT.max, // 100 requests in dev
   message: {
     error: 'Too many requests from this IP, please try again later.',
     retryAfter: process.env.NODE_ENV === 'development' ? 60 : Math.ceil(RATE_LIMIT_CONFIG.STRICT.windowMs / 1000)
@@ -15,7 +15,7 @@ export const rateLimitStrict = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   // Skip successful requests that don't indicate abuse
-  skipSuccessfulRequests: false,
+  skipSuccessfulRequests: true,
   // Skip failed requests that might be legitimate
   skipFailedRequests: false,
   // Custom key generator to include user ID if available

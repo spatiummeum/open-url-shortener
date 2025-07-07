@@ -3,14 +3,36 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { PrismaClient } from '@prisma/client';
-import { validateUserRegistration, validateUserLogin, handleValidationErrors, sanitizeInput } from '../middleware/validation';
+import { validateUserRegistration, validateUserLogin, sanitizeInput } from '../middleware/validation';
 import { requireAuth, optionalAuth } from '../middleware/auth';
 import { rateLimitStrict, rateLimitModerate } from '../middleware/rateLimiter';
 import { HTTP_STATUS, JWT_CONFIG } from '../utils/constants';
 import { sendPasswordResetEmail, sendWelcomeEmail } from '../services/emailService';
+import { validationResult } from 'express-validator';
 
 const router = Router();
 const prisma = new PrismaClient();
+
+/**
+ * Validation middleware wrapper based on Context7 express-validator best practices
+ */
+const validate = (validations: any[]) => {
+  return async (req: Request, res: Response, next: Function) => {
+    try {
+      // Run all validations
+      await Promise.all(validations.map((validation: any) => validation.run(req)));
+
+      const errors = validationResult(req);
+      if (errors.isEmpty()) {
+        return next();
+      }
+
+      res.status(400).json({ errors: errors.array() });
+    } catch (error) {
+      next(error);
+    }
+  };
+};
 
 interface AuthRequest extends Request {
   user?: {
@@ -47,10 +69,10 @@ const generateTokens = (userId: string) => {
 router.post('/register', 
   rateLimitStrict,
   sanitizeInput,
-  validateUserRegistration,
-  handleValidationErrors,
+  validate(validateUserRegistration),
   async (req: Request, res: Response): Promise<void> => {
     try {
+      console.log('Register request received:', { body: req.body });
       const { email, password, name } = req.body;
 
       // Check if user already exists
@@ -131,10 +153,10 @@ router.post('/register',
 router.post('/login',
   rateLimitStrict,
   sanitizeInput,
-  validateUserLogin,
-  handleValidationErrors,
+  validate(validateUserLogin),
   async (req: Request, res: Response): Promise<void> => {
     try {
+      console.log('Login request received:', { body: req.body });
       const { email, password } = req.body;
       const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
 

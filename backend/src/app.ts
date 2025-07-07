@@ -13,6 +13,7 @@ import analyticsRoutes from './routes/analytics';
 import usersRoutes from './routes/users';
 import domainsRoutes from './routes/domains';
 import webhooksRoutes from './routes/webhooks';
+import stripeRoutes from './routes/stripe';
 
 // Load environment variables
 dotenv.config();
@@ -41,6 +42,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/domains', domainsRoutes);
 app.use('/api/webhooks', webhooksRoutes);
+app.use('/api/stripe', stripeRoutes);
 
 // URL redirect route (should be last)
 app.use('/', redirectRoutes);

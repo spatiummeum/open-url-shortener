@@ -110,3 +110,106 @@ class ApiService {
 }
 
 export const apiService = new ApiService();
+
+// Métodos específicos para URLs
+export const urlApi = {
+  // Crear URL corta
+  createUrl: (data: {
+    originalUrl: string;
+    customCode?: string;
+    password?: string;
+    title?: string;
+    description?: string;
+    expiresAt?: string;
+  }) => apiService.post('/urls', data),
+
+  // Obtener URLs del usuario
+  getUrls: (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+  }) => apiService.get('/urls', { params }),
+
+  // Obtener URL específica
+  getUrl: (id: string) => apiService.get(`/urls/${id}`),
+
+  // Actualizar URL
+  updateUrl: (id: string, data: {
+    title?: string;
+    description?: string;
+    isActive?: boolean;
+  }) => apiService.put(`/urls/${id}`, data),
+
+  // Eliminar URL
+  deleteUrl: (id: string) => apiService.delete(`/urls/${id}`),
+
+  // Verificar contraseña de URL protegida
+  verifyPassword: (shortCode: string, password: string) => 
+    apiService.post(`/urls/verify-password/${shortCode}`, { password }),
+};
+
+// Métodos específicos para autenticación
+export const authApi = {
+  // Registro
+  register: (data: {
+    email: string;
+    password: string;
+    name?: string;
+  }) => apiService.post('/auth/register', data),
+
+  // Login
+  login: (data: {
+    email: string;
+    password: string;
+  }) => apiService.post('/auth/login', data),
+
+  // Refresh token
+  refreshToken: (refreshToken: string) => 
+    apiService.post('/auth/refresh', { refreshToken }),
+
+  // Logout
+  logout: () => apiService.post('/auth/logout'),
+};
+
+// Métodos específicos para usuarios
+export const userApi = {
+  // Obtener perfil
+  getProfile: () => apiService.get('/users/profile'),
+
+  // Actualizar perfil
+  updateProfile: (data: {
+    name?: string;
+    email?: string;
+    currentPassword?: string;
+    newPassword?: string;
+  }) => apiService.put('/users/profile', data),
+};
+
+// Métodos específicos para analytics
+export const analyticsApi = {
+  // Obtener analytics de una URL
+  getUrlAnalytics: (urlId: string, params?: {
+    period?: string;
+    startDate?: string;
+    endDate?: string;
+  }) => apiService.get(`/analytics/${urlId}`, { params }),
+
+  // Obtener dashboard de analytics
+  getDashboardAnalytics: (params?: {
+    period?: string;
+    startDate?: string;
+    endDate?: string;
+  }) => apiService.get('/analytics/dashboard', { params }),
+};
+
+// Métodos específicos para dominios
+export const domainApi = {
+  // Obtener dominios del usuario
+  getDomains: () => apiService.get('/domains'),
+
+  // Agregar dominio
+  addDomain: (data: { domain: string }) => apiService.post('/domains', data),
+
+  // Eliminar dominio
+  deleteDomain: (id: string) => apiService.delete(`/domains/${id}`),
+};

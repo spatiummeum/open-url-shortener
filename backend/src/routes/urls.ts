@@ -6,6 +6,7 @@ import { validateUrlCreation, validateUrlUpdate, handleValidationErrors, sanitiz
 import { requireAuth, optionalAuth, AuthRequest } from '../middleware/auth';
 import { rateLimitURLCreation, rateLimitModerate, rateLimitLenient } from '../middleware/rateLimiter';
 import { HTTP_STATUS, URL_CONFIG, PLAN_LIMITS } from '../utils/constants';
+import { validationResult } from 'express-validator';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -84,7 +85,7 @@ router.post('/',
   rateLimitURLCreation,
   sanitizeInput,
   optionalAuth,
-  validateUrlCreation,
+  ...validateUrlCreation,
   handleValidationErrors,
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
@@ -317,7 +318,7 @@ router.put('/:id',
   rateLimitModerate,
   requireAuth,
   sanitizeInput,
-  validateUrlUpdate,
+  ...validateUrlUpdate,
   handleValidationErrors,
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
