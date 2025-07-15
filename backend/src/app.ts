@@ -10,8 +10,8 @@ import urlRoutes from './routes/urls';
 import healthRoutes from './routes/health';
 import redirectRoutes from './routes/redirects';
 import analyticsRoutes from './routes/analytics';
-import usersRoutes from './routes/users';
-import domainsRoutes from './routes/domains';
+// import usersRoutes from './routes/users';
+// import domainsRoutes from './routes/domains';
 import webhooksRoutes from './routes/webhooks';
 import stripeRoutes from './routes/stripe';
 
@@ -22,7 +22,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
+}));
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
@@ -39,8 +41,8 @@ app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/urls', urlRoutes);
 app.use('/api/analytics', analyticsRoutes);
-app.use('/api/users', usersRoutes);
-app.use('/api/domains', domainsRoutes);
+// app.use('/api/users', usersRoutes);
+// app.use('/api/domains', domainsRoutes);
 app.use('/api/webhooks', webhooksRoutes);
 app.use('/api/stripe', stripeRoutes);
 

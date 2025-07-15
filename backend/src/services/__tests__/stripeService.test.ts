@@ -192,6 +192,7 @@ describe('StripeService', () => {
             id: 'cs_123',
             customer: 'cus_123',
             metadata: { userId: 'user_123' },
+            subscription: 'sub_stripe_123', // Added this line
           },
         },
       } as unknown as Stripe.Event;
@@ -210,8 +211,10 @@ describe('StripeService', () => {
       await handleWebhook(mockEvent);
 
       expect(mockPrisma.subscription.update).toHaveBeenCalledWith({
-        where: { id: 'sub_123' },
-        data: { status: 'active' },
+        where: { userId: 'user_123' }, // Changed from id to userId
+        data: {
+          stripeSubscriptionId: 'sub_stripe_123',
+        },
       });
 
       expect(mockPrisma.user.update).toHaveBeenCalledWith({
@@ -221,6 +224,7 @@ describe('StripeService', () => {
     });
 
     it('should handle customer.subscription.created event', async () => {
+      process.env.STRIPE_PRICE_ID_PRO = 'price_pro'; // Mock the env variable
       const mockEvent = {
         type: 'customer.subscription.created',
         data: {
@@ -255,7 +259,7 @@ describe('StripeService', () => {
         data: {
           stripeSubscriptionId: 'sub_stripe_123',
           status: 'active',
-          plan: 'PRO',
+          plan: 'PRO', // Expected PRO
           currentPeriodStart: new Date(1640995200 * 1000),
           currentPeriodEnd: new Date(1643673600 * 1000),
           cancelAtPeriodEnd: false,

@@ -2,10 +2,9 @@ import { Router, Request, Response } from 'express';
 import { requireAuth, AuthRequest } from '../middleware/auth';
 import { rateLimitModerate } from '../middleware/rateLimiter';
 import { createCheckoutSession, createCustomer, createPortalSession } from '../services/stripeService';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../utils/database';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 /**
  * Obtener configuración de Stripe (price IDs, etc.)

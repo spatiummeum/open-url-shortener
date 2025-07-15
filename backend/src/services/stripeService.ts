@@ -1,11 +1,30 @@
 import Stripe from 'stripe';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { SubscriptionStatus } from '@prisma/client';
+import { prisma } from '../utils/database';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2025-06-30.basil',
+  apiVersion: '2024-06-20',
 });
+
+// Mapear estados de Stripe a nuestros estados
+function mapStripeStatusToOurs(stripeStatus: string): SubscriptionStatus {
+  switch (stripeStatus) {
+    case 'active':
+      return 'active';
+    case 'canceled':
+    case 'ended':
+      return 'canceled';
+    case 'past_due':
+      return 'past_due';
+    case 'unpaid':
+      return 'unpaid';
+    case 'incomplete':
+    case 'incomplete_expired':
+    case 'trialing':
+    default:
+      return 'inactive';
+  }
+}
 
 // Crea un cliente de Stripe y Subscription en la base de datos
 export const createCustomer = async (userId: string, email: string) => {
@@ -156,7 +175,7 @@ export const handleWebhook = async (event: Stripe.Event) => {
           where: { stripeCustomerId: sub.customer },
           data: {
             stripeSubscriptionId: sub.id,
-            status: sub.status,
+            status: mapStripeStatusToOurs(sub.status),
             plan,
             currentPeriodStart: new Date((sub as any)['current_period_start'] * 1000),
             currentPeriodEnd: new Date((sub as any)['current_period_end'] * 1000),

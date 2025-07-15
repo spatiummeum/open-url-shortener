@@ -1,16 +1,16 @@
 import rateLimit from 'express-rate-limit';
 import { Request } from 'express';
-import { RATE_LIMIT_CONFIG } from '../utils/constants';
+import { RATE_LIMITS } from '../utils/constants';
 
 /**
  * Strict rate limiting for sensitive operations (login, register, password reset)
  */
 export const rateLimitStrict = rateLimit({
-  windowMs: process.env.NODE_ENV === 'development' ? 60 * 1000 : RATE_LIMIT_CONFIG.STRICT.windowMs, // 1 minute in dev
-  max: process.env.NODE_ENV === 'development' ? 100 : RATE_LIMIT_CONFIG.STRICT.max, // 100 requests in dev
+  windowMs: process.env.NODE_ENV === 'development' ? 60 * 1000 : RATE_LIMITS.STRICT.windowMs, // 1 minute in dev
+  max: process.env.NODE_ENV === 'development' ? 100 : RATE_LIMITS.STRICT.max, // 100 requests in dev
   message: {
     error: 'Too many requests from this IP, please try again later.',
-    retryAfter: process.env.NODE_ENV === 'development' ? 60 : Math.ceil(RATE_LIMIT_CONFIG.STRICT.windowMs / 1000)
+    retryAfter: process.env.NODE_ENV === 'development' ? 60 : Math.ceil(RATE_LIMITS.STRICT.windowMs / 1000)
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -19,7 +19,7 @@ export const rateLimitStrict = rateLimit({
   // Skip failed requests that might be legitimate
   skipFailedRequests: false,
   // Custom key generator to include user ID if available
-  keyGenerator: (req) => {
+  keyGenerator: (req: Request) => {
     const user = (req as any).user;
     const ip = req.ip || req.connection.remoteAddress || 'unknown';
     return user ? `${user.id}:${ip}` : ip;
@@ -30,17 +30,17 @@ export const rateLimitStrict = rateLimit({
  * Moderate rate limiting for general API operations
  */
 export const rateLimitModerate = rateLimit({
-  windowMs: RATE_LIMIT_CONFIG.MODERATE.windowMs,
-  max: RATE_LIMIT_CONFIG.MODERATE.max,
+  windowMs: RATE_LIMITS.MODERATE.windowMs,
+  max: RATE_LIMITS.MODERATE.max,
   message: {
     error: 'Too many requests from this IP, please try again later.',
-    retryAfter: Math.ceil(RATE_LIMIT_CONFIG.MODERATE.windowMs / 1000)
+    retryAfter: Math.ceil(RATE_LIMITS.MODERATE.windowMs / 1000)
   },
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: false,
   skipFailedRequests: false,
-  keyGenerator: (req) => {
+  keyGenerator: (req: Request) => {
     const user = (req as any).user;
     const ip = req.ip || req.connection.remoteAddress || 'unknown';
     return user ? `${user.id}:${ip}` : ip;
@@ -51,17 +51,17 @@ export const rateLimitModerate = rateLimit({
  * Lenient rate limiting for public operations (URL access, analytics)
  */
 export const rateLimitLenient = rateLimit({
-  windowMs: RATE_LIMIT_CONFIG.LENIENT.windowMs,
-  max: RATE_LIMIT_CONFIG.LENIENT.max,
+  windowMs: RATE_LIMITS.LENIENT.windowMs,
+  max: RATE_LIMITS.LENIENT.max,
   message: {
     error: 'Too many requests from this IP, please try again later.',
-    retryAfter: Math.ceil(RATE_LIMIT_CONFIG.LENIENT.windowMs / 1000)
+    retryAfter: Math.ceil(RATE_LIMITS.LENIENT.windowMs / 1000)
   },
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true,
   skipFailedRequests: false,
-  keyGenerator: (req) => {
+  keyGenerator: (req: Request) => {
     return req.ip || req.connection.remoteAddress || 'unknown';
   }
 });
@@ -70,17 +70,17 @@ export const rateLimitLenient = rateLimit({
  * API rate limiting for programmatic access
  */
 export const rateLimitAPI = rateLimit({
-  windowMs: RATE_LIMIT_CONFIG.API.windowMs,
-  max: RATE_LIMIT_CONFIG.API.max,
+  windowMs: RATE_LIMITS.API.windowMs,
+  max: RATE_LIMITS.API.max,
   message: {
     error: 'API rate limit exceeded. Please check your plan limits.',
-    retryAfter: Math.ceil(RATE_LIMIT_CONFIG.API.windowMs / 1000)
+    retryAfter: Math.ceil(RATE_LIMITS.API.windowMs / 1000)
   },
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: false,
   skipFailedRequests: false,
-  keyGenerator: (req) => {
+  keyGenerator: (req: Request) => {
     const user = (req as any).user;
     const ip = req.ip || req.connection.remoteAddress || 'unknown';
     const apiKey = req.headers['x-api-key'] as string;
@@ -98,7 +98,7 @@ export const rateLimitAPI = rateLimit({
  */
 export const rateLimitURLCreation = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: (req) => {
+  max: (req: Request) => {
     const user = (req as any).user;
     if (!user) return 10; // Anonymous users get 10 per hour
     
@@ -126,7 +126,7 @@ export const rateLimitURLCreation = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => {
+  keyGenerator: (req: Request) => {
     const user = (req as any).user;
     const ip = req.ip || req.connection.remoteAddress || 'unknown';
     return user ? `url-creation:${user.id}` : `url-creation:${ip}`;
@@ -147,7 +147,7 @@ export const rateLimitRedirect = rateLimit({
   legacyHeaders: false,
   skipSuccessfulRequests: false,
   skipFailedRequests: true, // Don't count 404s against the limit
-  keyGenerator: (req) => {
+  keyGenerator: (req: Request) => {
     return req.ip || req.connection.remoteAddress || 'unknown';
   }
 });

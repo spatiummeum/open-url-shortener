@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../utils/database';
 import { validateUserRegistration, validateUserLogin, sanitizeInput } from '../middleware/validation';
 import { requireAuth, optionalAuth } from '../middleware/auth';
 import { rateLimitStrict, rateLimitModerate } from '../middleware/rateLimiter';
@@ -11,7 +11,6 @@ import { sendPasswordResetEmail, sendWelcomeEmail } from '../services/emailServi
 import { validationResult } from 'express-validator';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 /**
  * Validation middleware wrapper based on Context7 express-validator best practices
@@ -130,10 +129,7 @@ router.post('/register',
       });
 
       // Send welcome email (don't await to avoid delaying the response)
-      sendWelcomeEmail({
-        to: user.email,
-        userName: user.name || 'New User'
-      }).catch(error => {
+      sendWelcomeEmail(user.email, user.name || 'New User').catch(error => {
         console.error('Failed to send welcome email:', error);
       });
 
@@ -420,11 +416,7 @@ router.post('/forgot-password',
       
       try {
         // Send password reset email using Resend
-        await sendPasswordResetEmail({
-          to: user.email,
-          resetUrl,
-          userName: user.name || undefined
-        });
+        await sendPasswordResetEmail(user.email, resetToken, user.name || undefined);
         console.log(`Password reset email sent to ${email}`);
       } catch (emailError) {
         console.error('Failed to send password reset email:', emailError);

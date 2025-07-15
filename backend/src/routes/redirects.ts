@@ -1,11 +1,10 @@
 import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../utils/database';
 import { rateLimitRedirect } from '../middleware/rateLimiter';
 import { HTTP_STATUS } from '../utils/constants';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 /**
  * Redirect to original URL

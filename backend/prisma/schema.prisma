@@ -1,0 +1,147 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  password      String
+  plan          Plan     @default(FREE)
+  isActive      Boolean  @default(true)
+  isVerified    Boolean  @default(false)
+  lastLogin     DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  urls                   Url[]
+  refreshTokens          RefreshToken[]
+  loginAttempts          LoginAttempt[]
+  passwordResetTokens    PasswordResetToken[]
+  subscription           Subscription?
+
+  @@map("users")
+}
+
+model Url {
+  id           String    @id @default(cuid())
+  originalUrl  String
+  shortCode    String    @unique
+  title        String?
+  description  String?
+  password     String?   // Hashed password for protected URLs
+  expiresAt    DateTime?
+  isActive     Boolean   @default(true)
+  userId       String?   // Nullable for anonymous URLs
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  user         User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  clicks       Click[]
+
+  @@map("urls")
+}
+
+model Click {
+  id         String   @id @default(cuid())
+  urlId      String
+  ip         String
+  userAgent  String?
+  referer    String?
+  country    String?  // For analytics
+  city       String?  // For analytics
+  device     String?  // For analytics
+  browser    String?  // For analytics
+  createdAt  DateTime @default(now())
+
+  // Relations
+  url        Url      @relation(fields: [urlId], references: [id], onDelete: Cascade)
+
+  @@map("clicks")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  email     String
+  ip        String
+  success   Boolean
+  userId    String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("login_attempts")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  token     String    // Hashed token
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  // Relations
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
+
+model Subscription {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  stripeCustomerId     String    @unique
+  stripeSubscriptionId String?   @unique
+  plan                 Plan      @default(FREE)
+  status               SubscriptionStatus @default(inactive)
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Relations
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+// Enums
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  active
+  inactive
+  canceled
+  past_due
+  unpaid
+}

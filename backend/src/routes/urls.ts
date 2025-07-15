@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { nanoid } from 'nanoid';
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../utils/database';
 import { validateUrlCreation, validateUrlUpdate, handleValidationErrors, sanitizeInput } from '../middleware/validation';
 import { requireAuth, optionalAuth, AuthRequest } from '../middleware/auth';
 import { rateLimitURLCreation, rateLimitModerate, rateLimitLenient } from '../middleware/rateLimiter';
@@ -9,7 +9,6 @@ import { HTTP_STATUS, URL_CONFIG, PLAN_LIMITS } from '../utils/constants';
 import { validationResult } from 'express-validator';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 /**
  * Generate unique short code
@@ -233,7 +232,7 @@ router.get('/',
       ]);
 
       res.json({
-        urls: urls.map(url => ({
+        urls: urls.map((url: any) => ({
           ...url,
           shortUrl: `${process.env.BASE_URL || 'http://localhost:3001'}/${url.shortCode}`,
           clickCount: url._count.clicks

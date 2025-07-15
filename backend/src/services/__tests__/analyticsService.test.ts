@@ -61,7 +61,7 @@ describe('AnalyticsService', () => {
       {
         id: 'click-1',
         ip: '192.168.1.1',
-        timestamp: new Date('2025-07-01'),
+        createdAt: new Date('2025-07-01'),
         urlId: 'url-1',
         userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         referer: 'https://google.com',
@@ -74,7 +74,7 @@ describe('AnalyticsService', () => {
       {
         id: 'click-2',
         ip: '192.168.1.2',
-        timestamp: new Date('2025-07-02'),
+        createdAt: new Date('2025-07-02'),
         urlId: 'url-1',
         userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15',
         referer: null,
@@ -88,6 +88,7 @@ describe('AnalyticsService', () => {
 
     it('should return empty analytics for user with no URLs', async () => {
       mockPrisma.url.findMany.mockResolvedValue([]);
+      mockPrisma.click.findMany.mockResolvedValue([]);
 
       const result = await getDashboardAnalytics(mockUserId);
 
@@ -141,8 +142,8 @@ describe('AnalyticsService', () => {
         percentage: 100
       });
 
-      expect(result.comparison.clicks.current).toBe(2);
-      expect(result.comparison.clicks.previous).toBe(0);
+      expect(result.comparison?.clicks?.current).toBe(2);
+      expect(result.comparison?.clicks?.previous).toBe(0);
     });
 
     it('should handle different time periods', async () => {
@@ -173,7 +174,7 @@ describe('AnalyticsService', () => {
       {
         id: 'click-1',
         ip: '192.168.1.1',
-        timestamp: new Date('2025-07-01T10:00:00Z'),
+        createdAt: new Date('2025-07-01T10:00:00Z'),
         userAgent: 'Mozilla/5.0 Chrome/91.0',
         referer: 'https://google.com',
         country: 'United States',
@@ -185,7 +186,7 @@ describe('AnalyticsService', () => {
       {
         id: 'click-2',
         ip: '192.168.1.1',
-        timestamp: new Date('2025-07-01T15:00:00Z'),
+        createdAt: new Date('2025-07-01T15:00:00Z'),
         userAgent: 'Mozilla/5.0 Chrome/91.0',
         referer: 'https://twitter.com',
         country: 'United States',
@@ -241,11 +242,11 @@ describe('AnalyticsService', () => {
 
   const result = await getUrlAnalytics(mockUrlId, mockUserId);
   // Ajuste: los clicks caen en las horas 6 y 11 por desfase de zona horaria
-  expect(result!.charts.hourlyDistribution.find(h => h.hour === 6)?.clicks).toBe(1); // 10 AM UTC-4
-  expect(result!.charts.hourlyDistribution.find(h => h.hour === 11)?.clicks).toBe(1); // 3 PM UTC-4
+  expect(result!.charts.hourlyDistribution.find((h: any) => h.hour === 6)?.clicks).toBe(1); // 10 AM UTC-4
+  expect(result!.charts.hourlyDistribution.find((h: any) => h.hour === 11)?.clicks).toBe(1); // 3 PM UTC-4
 
   // July 1, 2025 es martes (índice 2)
-  expect(result!.charts.weeklyDistribution.find(d => d.day === 'Tuesday')?.clicks).toBe(2);
+  expect(result!.charts.weeklyDistribution.find((d: any) => d.day === 'Tuesday')?.clicks).toBe(2);
     });
   });
 
@@ -290,7 +291,7 @@ describe('AnalyticsService', () => {
       expect(mockPrisma.click.groupBy).toHaveBeenCalledWith({
         by: ['urlId'],
         where: {
-          timestamp: {
+          createdAt: {
             gte: expect.any(Date),
             lte: expect.any(Date)
           }
@@ -334,7 +335,7 @@ describe('AnalyticsService', () => {
       expect(mockPrisma.click.groupBy).toHaveBeenCalledWith({
         by: ['urlId'],
         where: {
-          timestamp: {
+          createdAt: {
             gte: expect.any(Date),
             lte: expect.any(Date)
           }
@@ -358,7 +359,7 @@ describe('AnalyticsService', () => {
         {
           id: 'click-1',
           ip: '192.168.1.1',
-          timestamp: new Date(),
+          createdAt: new Date(),
           userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
           referer: null,
           country: 'US',
@@ -394,7 +395,7 @@ describe('AnalyticsService', () => {
         {
           id: 'click-1',
           ip: '192.168.1.1',
-          timestamp: new Date(),
+          createdAt: new Date(),
           userAgent: 'Mozilla/5.0',
           referer: 'https://www.google.com/search?q=test',
           country: 'US',
