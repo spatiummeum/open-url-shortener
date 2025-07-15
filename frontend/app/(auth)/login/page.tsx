@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { apiService } from '../../../src/services/apiService';
 import { useAuthStore } from '../../../src/store/authStore';
-import { AuthDebug } from '../../../src/components/AuthDebug';
+import AuthDebug from '../../../src/components/AuthDebug';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -17,7 +17,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   
   const router = useRouter();
-  const { login } = useAuthStore();
+  const { updateUser, updateTokens } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,13 +27,12 @@ export default function LoginPage() {
     try {
       const response = await apiService.post('/auth/login', formData);
       
-      login(
-        response.user,
-        {
-          accessToken: response.tokens.accessToken,
-          refreshToken: response.tokens.refreshToken,
-        }
-      );
+      // Guardar datos de login exitoso
+      updateUser(response.user);
+      updateTokens({
+        accessToken: response.tokens.accessToken,
+        refreshToken: response.tokens.refreshToken,
+      });
 
       router.push('/dashboard');
     } catch (err: any) {

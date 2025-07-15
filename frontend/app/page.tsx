@@ -63,18 +63,18 @@ export default function Home() {
 
           {/* Auth buttons */}
           <div className="flex gap-4">
-            <Link
+            <a
               href="/login"
               className="px-6 py-3 bg-white text-gray-900 font-semibold rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
             >
               Sign In
-            </Link>
-            <Link
+            </a>
+            <a
               href="/register"
               className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
             >
               Get Started Free
-            </Link>
+            </a>
           </div>
         </div>
       </div>
