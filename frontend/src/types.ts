@@ -108,6 +108,7 @@ export interface Url {
   id: string;
   originalUrl: string;
   shortCode: string;
+  shortUrl?: string;
   title: string | null;
   description: string | null;
   password: boolean; // Indicates if URL is password protected

@@ -1,0 +1,508 @@
+@import "tailwindcss";
+
+/* Tailwind CSS v4 Theme Configuration */
+@theme {
+  /* Modern OKLCH Colors for better color consistency */
+  --color-primary-50: oklch(0.97 0.013 231.6);
+  --color-primary-100: oklch(0.94 0.025 231.6);
+  --color-primary-200: oklch(0.86 0.055 231.6);
+  --color-primary-300: oklch(0.77 0.085 231.6);
+  --color-primary-400: oklch(0.66 0.125 231.6);
+  --color-primary-500: oklch(0.57 0.155 231.6);
+  --color-primary-600: oklch(0.47 0.155 231.6);
+  --color-primary-700: oklch(0.39 0.135 231.6);
+  --color-primary-800: oklch(0.32 0.115 231.6);
+  --color-primary-900: oklch(0.26 0.095 231.6);
+  --color-primary-950: oklch(0.18 0.075 231.6);
+
+  /* Success Colors */
+  --color-success-50: oklch(0.97 0.02 142);
+  --color-success-100: oklch(0.93 0.04 142);
+  --color-success-200: oklch(0.85 0.08 142);
+  --color-success-300: oklch(0.75 0.13 142);
+  --color-success-400: oklch(0.64 0.17 142);
+  --color-success-500: oklch(0.55 0.17 142);
+  --color-success-600: oklch(0.45 0.17 142);
+  --color-success-700: oklch(0.37 0.15 142);
+  --color-success-800: oklch(0.30 0.12 142);
+  --color-success-900: oklch(0.25 0.10 142);
+
+  /* Warning Colors */
+  --color-warning-50: oklch(0.97 0.02 65);
+  --color-warning-100: oklch(0.93 0.04 65);
+  --color-warning-200: oklch(0.85 0.08 65);
+  --color-warning-300: oklch(0.75 0.13 65);
+  --color-warning-400: oklch(0.64 0.17 65);
+  --color-warning-500: oklch(0.55 0.17 65);
+  --color-warning-600: oklch(0.45 0.17 65);
+  --color-warning-700: oklch(0.37 0.15 65);
+  --color-warning-800: oklch(0.30 0.12 65);
+  --color-warning-900: oklch(0.25 0.10 65);
+
+  /* Danger Colors */
+  --color-danger-50: oklch(0.97 0.02 17);
+  --color-danger-100: oklch(0.93 0.04 17);
+  --color-danger-200: oklch(0.85 0.08 17);
+  --color-danger-300: oklch(0.75 0.13 17);
+  --color-danger-400: oklch(0.64 0.17 17);
+  --color-danger-500: oklch(0.55 0.17 17);
+  --color-danger-600: oklch(0.45 0.17 17);
+  --color-danger-700: oklch(0.37 0.15 17);
+  --color-danger-800: oklch(0.30 0.12 17);
+  --color-danger-900: oklch(0.25 0.10 17);
+  
+  /* Custom Gray Scale */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  
+  /* Custom Font Families */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  
+  /* Custom Animations */
+  --animate-fade-in: fadeIn 0.5s ease-in-out;
+  --animate-slide-up: slideUp 0.3s ease-out;
+  --animate-bounce-subtle: bounceSubtle 0.6s ease-in-out;
+  --animate-pulse-slow: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  
+  /* Custom Spacing */
+  --spacing-18: 4.5rem;
+  --spacing-88: 22rem;
+  
+  /* Custom Border Radius */
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+  
+  /* Custom Shadows with OKLCH */
+  --shadow-soft: 0 4px 6px -1px oklch(0 0 0 / 0.1), 0 2px 4px -1px oklch(0 0 0 / 0.06);
+  --shadow-medium: 0 10px 15px -3px oklch(0 0 0 / 0.1), 0 4px 6px -2px oklch(0 0 0 / 0.05);
+  --shadow-strong: 0 20px 25px -5px oklch(0 0 0 / 0.1), 0 10px 10px -5px oklch(0 0 0 / 0.04);
+  --shadow-glow: 0 0 20px oklch(0.57 0.155 231.6 / 0.3);
+  
+  /* Custom Backdrop Blur */
+  --blur-xs: 2px;
+  
+  /* Custom Breakpoints */
+  --breakpoint-xs: 30rem;
+  --breakpoint-3xl: 120rem;
+}
+
+/* Keyframes for custom animations */
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slideUp {
+  0% { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes bounceSubtle {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-5px); }
+  60% { transform: translateY(-3px); }
+}
+
+/* New Tailwind CSS v4 Custom Utilities */
+@utility content-auto {
+  content-visibility: auto;
+}
+
+@utility tab-4 {
+  tab-size: 4;
+}
+
+@utility tab-8 {
+  tab-8: 8;
+}
+
+/* Container utility with custom behavior */
+@utility container {
+  margin-inline: auto;
+  padding-inline: 2rem;
+  max-width: 80rem;
+}
+
+/* Custom supports variants */
+@custom-variant supports-grid {
+  @supports (display: grid) {
+    @slot;
+  }
+}
+
+@custom-variant supports-backdrop-filter {
+  @supports (backdrop-filter: blur(1px)) {
+    @slot;
+  }
+}
+
+/* Custom hover variant for better touch device support */
+@custom-variant hover-device {
+  @media (hover: hover) {
+    &:hover {
+      @slot;
+    }
+  }
+}
+
+/* Text wrap utilities for better typography */
+@utility text-balance {
+  text-wrap: balance;
+}
+
+@utility text-pretty {
+  text-wrap: pretty;
+}
+
+/* Writing mode utilities */
+@utility writing-vertical {
+  writing-mode: vertical-lr;
+}
+
+@utility writing-horizontal {
+  writing-mode: horizontal-tb;
+}
+
+/* Migrated Components Layer */
+
+/* Button Base Component */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: all 200ms;
+  outline: none;
+  border: none;
+  cursor: pointer;
+}
+
+.btn:focus {
+  box-shadow: 0 0 0 2px var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Button Variants */
+.btn-primary {
+  background-color: var(--color-primary-600);
+  color: white;
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-700);
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-secondary {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-900);
+  border: 1px solid var(--color-gray-300);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-gray-200);
+}
+
+.btn-outline {
+  border: 2px solid var(--color-primary-600);
+  color: var(--color-primary-600);
+  background-color: transparent;
+}
+
+.btn-outline:hover {
+  background-color: var(--color-primary-600);
+  color: white;
+}
+
+.btn-ghost {
+  color: var(--color-gray-600);
+  background-color: transparent;
+}
+
+.btn-ghost:hover {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-900);
+}
+
+.btn-danger {
+  background-color: #dc2626;
+  color: white;
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c;
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-success {
+  background-color: #059669;
+  color: white;
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-success:hover {
+  background-color: #047857;
+  box-shadow: var(--shadow-medium);
+}
+
+/* Input Components */
+.input-field {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-gray-300);
+  border-radius: 0.5rem;
+  outline: none;
+  transition: all 200ms;
+}
+
+.input-field::placeholder {
+  color: var(--color-gray-400);
+}
+
+.input-field:focus {
+  box-shadow: 0 0 0 2px var(--color-primary-500);
+  border-color: transparent;
+}
+
+.input-error {
+  border-color: #ef4444;
+}
+
+.input-error:focus {
+  box-shadow: 0 0 0 2px #ef4444;
+}
+
+.input-success {
+  border-color: #10b981;
+}
+
+.input-success:focus {
+  box-shadow: 0 0 0 2px #10b981;
+}
+
+/* Card Components */
+.card {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--color-gray-200);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--color-gray-200);
+  background-color: var(--color-gray-50);
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-footer {
+  padding: 1.5rem;
+  border-top: 1px solid var(--color-gray-200);
+  background-color: var(--color-gray-50);
+}
+
+/* Badge Components */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge-primary {
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-800);
+}
+
+.badge-secondary {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-800);
+}
+
+.badge-success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.badge-danger {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-warning {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+/* Active State Utility */
+.click-effect:active {
+  transform: scale(0.98);
+  transition: transform 100ms;
+}
+
+/* Enhanced Glass Morphism Components using v4 */
+.glass-modern {
+  backdrop-filter: blur(20px) saturate(180%);
+  background: oklch(1 0 0 / 0.7);
+  border: 1px solid oklch(1 0 0 / 0.125);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.glass-dark {
+  backdrop-filter: blur(20px) saturate(180%);
+  background: oklch(0.15 0 0 / 0.8);
+  border: 1px solid oklch(1 0 0 / 0.1);
+  color: oklch(0.9 0 0);
+}
+
+/* Enhanced Focus States */
+.focus-ring-modern {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: all 200ms ease;
+}
+
+.focus-ring-modern:focus {
+  outline: 2px solid oklch(0.57 0.155 231.6);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px oklch(0.57 0.155 231.6 / 0.1);
+}
+
+/* Modern Gradient Text Effects */
+.text-gradient-modern {
+  background: linear-gradient(135deg, 
+    oklch(0.57 0.155 231.6), 
+    oklch(0.7 0.15 280),
+    oklch(0.6 0.15 200)
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Container Queries Support */
+@container (min-width: 20rem) {
+  .container-query-responsive {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@container (min-width: 40rem) {
+  .container-query-responsive {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Modern Animation States */
+.animate-entrance {
+  animation: entranceAnimation 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes entranceAnimation {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-10deg);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.05) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Enhanced Button States with Modern CSS */
+.btn-modern {
+  position: relative;
+  overflow: hidden;
+  transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-modern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, oklch(1 0 0 / 0.2), transparent);
+  transition: left 600ms ease;
+}
+
+.btn-modern:hover::before {
+  left: 100%;
+}
+
+/* Scroll-driven Animations (where supported) */
+@supports (animation-timeline: scroll()) {
+  .scroll-fade {
+    animation: scrollFade linear both;
+    animation-timeline: scroll();
+    animation-range: entry 0% cover 40%;
+  }
+  
+  @keyframes scrollFade {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Enhanced Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .card {
+    background-color: oklch(0.15 0 0);
+    border-color: oklch(0.25 0 0);
+    color: oklch(0.9 0 0);
+  }
+  
+  .glass-modern {
+    background: oklch(0.15 0 0 / 0.8);
+    border: 1px solid oklch(1 0 0 / 0.1);
+  }
+}
+
+/* Source Detection for Tailwind v4 */
+@source "app/**/*.{js,ts,jsx,tsx}";
+@source "src/**/*.{js,ts,jsx,tsx}";

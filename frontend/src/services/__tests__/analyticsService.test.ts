@@ -140,7 +140,7 @@ describe('Analytics Service', () => {
 
       expect(result).toEqual(mockDashboardAnalytics);
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/analytics/dashboard?period=30d',
+        'http://localhost:3002/api/analytics/dashboard?period=30d',
         {
           method: 'GET',
           headers: {
@@ -176,7 +176,7 @@ describe('Analytics Service', () => {
       await analyticsService.getDashboardAnalytics();
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/analytics/dashboard?period=30d',
+        'http://localhost:3002/api/analytics/dashboard?period=30d',
         expect.any(Object)
       );
     });
@@ -195,7 +195,7 @@ describe('Analytics Service', () => {
 
       expect(result).toEqual(mockUrlAnalytics);
       expect(mockFetch).toHaveBeenCalledWith(
-        `http://localhost:3001/api/analytics/${mockUrlId}?period=7d`,
+        `http://localhost:3002/api/analytics/${mockUrlId}?period=7d`,
         {
           method: 'GET',
           headers: {
@@ -238,7 +238,7 @@ describe('Analytics Service', () => {
       const result = await analyticsService.exportAnalytics();
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/analytics/dashboard/export?period=30d',
+        'http://localhost:3002/api/analytics/dashboard/export?period=30d',
         {
           method: 'GET',
           headers: {
@@ -262,7 +262,7 @@ describe('Analytics Service', () => {
       const result = await analyticsService.exportAnalytics('url-123', '7d');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/analytics/url-123/export?period=7d',
+        'http://localhost:3002/api/analytics/url-123/export?period=7d',
         expect.any(Object)
       );
 

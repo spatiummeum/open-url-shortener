@@ -55,7 +55,7 @@ jest.mock('next/navigation', () => ({
 }))
 
 // Mock environment variables
-process.env.NEXT_PUBLIC_API_URL = 'http://localhost:3001/api'
+process.env.NEXT_PUBLIC_API_URL = 'http://localhost:3002/api'
 process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = 'pk_test_mock'
 
 // Mock global fetch if needed

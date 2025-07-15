@@ -149,18 +149,18 @@ export default function UrlForm({ onSuccess, className = '' }: UrlFormProps) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`bg-white rounded-2xl shadow-xl p-6 ${className}`}
+        className={`glass-modern backdrop-blur-xl rounded-3xl shadow-strong border border-white/20 p-8 ${className}`}
       >
         <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 bg-gradient-to-br from-success-100 to-success-200 rounded-full flex items-center justify-center mx-auto mb-4 shadow-glow">
+            <svg className="w-8 h-8 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">URL Created Successfully!</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2 text-balance">URL Created Successfully!</h3>
           
           {result.hasPassword && (
-            <div className="flex items-center justify-center gap-2 text-yellow-600 text-sm mb-4">
+            <div className="flex items-center justify-center gap-2 text-warning-600 text-sm mb-4 bg-warning-50 px-3 py-2 rounded-lg border border-warning-200">
               <LockClosedIcon className="w-4 h-4" />
               <span>This URL is password protected</span>
             </div>
@@ -177,7 +177,7 @@ export default function UrlForm({ onSuccess, className = '' }: UrlFormProps) {
             />
             <button
               onClick={copyToClipboard}
-              className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              className="btn-modern px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-medium rounded-xl hover:shadow-glow focus-ring-modern transition-all duration-300 transform hover:scale-105"
             >
               Copy Link
             </button>
@@ -200,13 +200,13 @@ export default function UrlForm({ onSuccess, className = '' }: UrlFormProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`bg-white rounded-2xl shadow-xl p-6 ${className}`}
+      className={`glass-modern backdrop-blur-xl rounded-3xl shadow-strong border border-white/20 p-8 animate-entrance ${className}`}
     >
       {error && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+          className="mb-4 p-4 bg-danger-50 border border-danger-200 rounded-xl text-danger-700 text-sm backdrop-blur-sm"
         >
           {error}
         </motion.div>
@@ -224,7 +224,7 @@ export default function UrlForm({ onSuccess, className = '' }: UrlFormProps) {
             value={formData.originalUrl}
             onChange={(e) => handleInputChange('originalUrl', e.target.value)}
             placeholder="https://example.com/very-long-url"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-300 backdrop-blur-sm bg-white/80 focus-ring-modern"
             required
           />
         </div>
@@ -352,7 +352,7 @@ export default function UrlForm({ onSuccess, className = '' }: UrlFormProps) {
         <button
           type="submit"
           disabled={loading || !formData.originalUrl.trim()}
-          className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+          className="w-full px-6 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl hover:shadow-glow disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center btn-modern focus-ring-modern hover:scale-[1.02] text-balance"
         >
           {loading ? (
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

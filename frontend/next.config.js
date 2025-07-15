@@ -8,12 +8,16 @@ const nextConfig = {
   },
   reactStrictMode: true,
   typescript: {
-    // Don't fail build on TypeScript errors during development
-    ignoreBuildErrors: process.env.NODE_ENV === 'development',
+    // Enable TypeScript checking in development
+    ignoreBuildErrors: false,
   },
   eslint: {
-    // Don't fail build on ESLint errors during development
-    ignoreDuringBuilds: process.env.NODE_ENV === 'development',
+    // Enable ESLint checking in development
+    ignoreDuringBuilds: false,
+  },
+  // Configure experimental features for better Tailwind CSS v4 support
+  experimental: {
+    optimizePackageImports: ['@heroicons/react', 'lucide-react'],
   },
 }
 
