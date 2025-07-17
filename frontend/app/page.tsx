@@ -1,11 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import UrlForm from '../src/components/UrlForm';
+import { useAuthStore } from '../src/store/authStore';
 
 export default function Home() {
   const [createdUrl, setCreatedUrl] = useState<any>(null);
+  const { user, isAuthenticated, checkAuth } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 relative overflow-hidden">
@@ -15,6 +21,21 @@ export default function Home() {
       <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-success-500/10 rounded-full blur-3xl"></div>
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* My Account button for logged-in users */}
+        {isAuthenticated && (
+          <div className="absolute top-4 right-4 z-20">
+            <Link 
+              href="/dashboard"
+              className="px-6 py-3 glass-modern text-gray-900 font-semibold rounded-xl border border-white/30 hover:bg-white/80 transition-all duration-300 backdrop-blur-sm hover-scale focus-ring-modern inline-flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              My Account
+            </Link>
+          </div>
+        )}
+        
         <div className="flex flex-col items-center justify-center min-h-screen py-12">
           {/* Header */}
           <div className="text-center mb-12 scroll-fade">
@@ -66,21 +87,23 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Auth buttons */}
-          <div className="flex gap-4 justify-center">
-            <a
-              href="/login"
-              className="px-8 py-4 glass-modern text-gray-900 font-semibold rounded-xl border border-white/30 hover:bg-white/80 transition-all duration-300 backdrop-blur-sm hover-scale focus-ring-modern"
-            >
-              Sign In
-            </a>
-            <a
-              href="/register"
-              className="px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl hover:shadow-glow transition-all duration-300 btn-modern focus-ring-modern hover:scale-105"
-            >
-              Get Started Free
-            </a>
-          </div>
+          {/* Auth buttons - only show if not authenticated */}
+          {!isAuthenticated && (
+            <div className="flex gap-4 justify-center">
+              <a
+                href="/login"
+                className="px-8 py-4 glass-modern text-gray-900 font-semibold rounded-xl border border-white/30 hover:bg-white/80 transition-all duration-300 backdrop-blur-sm hover-scale focus-ring-modern"
+              >
+                Sign In
+              </a>
+              <a
+                href="/register"
+                className="px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl hover:shadow-glow transition-all duration-300 btn-modern focus-ring-modern hover:scale-105"
+              >
+                Get Started Free
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </div>

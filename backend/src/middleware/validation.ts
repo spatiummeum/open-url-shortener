@@ -45,7 +45,7 @@ export const validateUserRegistration: ValidationChain[] = [
       ];
       
       if (commonPasswords.includes(value.toLowerCase())) {
-        throw new Error('Password is too common');
+        throw new Error('Password is too common. Please use a stronger password.');
       }
       
       // Check for repeated characters
@@ -73,8 +73,8 @@ export const validateUserRegistration: ValidationChain[] = [
     .trim()
     .isLength({ min: 2, max: 50 })
     .withMessage('Name must be between 2 and 50 characters')
-    .matches(/^[a-zA-Z\\s\\u00C0-\\u017F]+$/)
-    .withMessage('Name can only contain letters, spaces, and accented characters')
+    .isAlphanumeric('en-US', { ignore: ' ._-' })
+    .withMessage('Name can only contain letters, numbers, spaces, and basic punctuation')
 ];
 
 /**
