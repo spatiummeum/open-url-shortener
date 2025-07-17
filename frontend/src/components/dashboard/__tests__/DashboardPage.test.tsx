@@ -1,13 +1,13 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DashboardPage from '../../../../app/(dashboard)/dashboard/page';
-import { apiService } from '../../../services/apiService';
-import { useAuthStore } from '../../../store/authStore';
+import { apiService } from '@/services/apiService';
+import { useAuthStore } from '@/store/authStore';
 
 // Mock the dependencies
-jest.mock('../../../services/apiService');
-jest.mock('../../../store/authStore');
-jest.mock('../../../hooks/useStripeSubscription', () => ({
+jest.mock('@/services/apiService');
+jest.mock('@/store/authStore');
+jest.mock('@/hooks/useStripeSubscription', () => ({
   useStripeSubscription: () => ({
     subscription: null,
     loading: false,
@@ -81,16 +81,20 @@ describe('DashboardPage', () => {
   test('renders dashboard header', async () => {
     mockApiService.get.mockResolvedValue(mockDashboardData);
     
-    render(<DashboardPage />);
+    await act(async () => {
+      render(<DashboardPage />);
+    });
     
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByText('Monitor your URL shortening performance')).toBeInTheDocument();
   });
 
-  test('displays loading state initially', () => {
+  test('displays loading state initially', async () => {
     mockApiService.get.mockImplementation(() => new Promise(() => {})); // Never resolves
     
-    render(<DashboardPage />);
+    await act(async () => {
+      render(<DashboardPage />);
+    });
     
     // Should show skeleton loading states - check that there are at least 4 loading elements
     expect(document.querySelectorAll('.animate-pulse').length).toBeGreaterThanOrEqual(4);
@@ -167,7 +171,9 @@ describe('DashboardPage', () => {
     const errorMessage = 'Failed to load dashboard data';
     mockApiService.get.mockRejectedValue(new Error(errorMessage));
     
-    render(<DashboardPage />);
+    await act(async () => {
+      render(<DashboardPage />);
+    });
     
     await waitFor(() => {
       expect(screen.getByText('Error loading dashboard')).toBeInTheDocument();

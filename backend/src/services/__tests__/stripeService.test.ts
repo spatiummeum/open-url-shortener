@@ -21,10 +21,18 @@ jest.mock('@prisma/client', () => ({
 
 // Mock Stripe
 const mockStripe = {
+  subscriptions: {
+    retrieve: jest.fn() as jest.MockedFunction<any>,
+  },
   customers: {
     create: jest.fn() as jest.MockedFunction<any>,
   },
   checkout: {
+    sessions: {
+      create: jest.fn() as jest.MockedFunction<any>,
+    },
+  },
+  billingPortal: {
     sessions: {
       create: jest.fn() as jest.MockedFunction<any>,
     },
@@ -185,6 +193,10 @@ describe('StripeService', () => {
 
   describe('handleWebhook', () => {
     it('should handle checkout.session.completed event', async () => {
+      // Set up environment variables for the test
+      process.env.STRIPE_PRICE_ID_PRO = 'price_pro_123';
+      process.env.STRIPE_PRICE_ID_ENTERPRISE = 'price_enterprise_123';
+
       const mockEvent = {
         type: 'checkout.session.completed',
         data: {
@@ -204,9 +216,25 @@ describe('StripeService', () => {
         plan: 'PRO',
       };
 
+      const mockStripeSubscription = {
+        id: 'sub_stripe_123',
+        items: {
+          data: [
+            {
+              price: {
+                id: 'price_pro_123'
+              }
+            }
+          ]
+        }
+      };
+
       mockPrisma.subscription.findUnique.mockResolvedValue(mockSubscription);
       mockPrisma.subscription.update.mockResolvedValue(mockSubscription);
       mockPrisma.user.update.mockResolvedValue({});
+
+      // Mock stripe.subscriptions.retrieve
+      mockStripe.subscriptions.retrieve.mockResolvedValue(mockStripeSubscription);
 
       await handleWebhook(mockEvent);
 

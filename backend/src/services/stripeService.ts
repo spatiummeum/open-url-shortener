@@ -3,7 +3,7 @@ import { SubscriptionStatus } from '@prisma/client';
 import { prisma } from '../utils/database';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2024-06-20',
+  apiVersion: '2025-06-30.basil',
 });
 
 // Mapear estados de Stripe a nuestros estados
@@ -106,12 +106,29 @@ export const handleWebhook = async (event: Stripe.Event) => {
         return;
       }
 
+      // Get the subscription details from Stripe to determine the plan
+      const stripeSubscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+      const priceId = stripeSubscription.items.data[0]?.price.id;
+      
+      const planMap: { [key: string]: 'PRO' | 'ENTERPRISE' } = {
+        [process.env.STRIPE_PRICE_ID_PRO!]: 'PRO',
+        [process.env.STRIPE_PRICE_ID_ENTERPRISE!]: 'ENTERPRISE',
+      };
+      
+      const plan = priceId ? planMap[priceId] || 'FREE' : 'FREE';
+
       // Update subscription with stripeSubscriptionId
       await prisma.subscription.update({
         where: { userId: userId },
         data: {
           stripeSubscriptionId: stripeSubscriptionId,
         },
+      });
+
+      // Update user plan
+      await prisma.user.update({
+        where: { id: userId },
+        data: { plan },
       });
       break;
     }

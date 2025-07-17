@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useStripeSubscription } from '../../hooks/useStripeSubscription';
+import { useStripeSubscription } from '@/hooks/useStripeSubscription';
 
 export interface QuickAction {
   title: string;

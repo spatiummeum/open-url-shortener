@@ -1,9 +1,9 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import UpgradeButton from '../UpgradeButton';
-import { stripeService } from '../../services/stripeService';
+import { stripeService } from '@/services/stripeService';
 
 // Mock the stripe service
-jest.mock('../../services/stripeService', () => ({
+jest.mock('@/services/stripeService', () => ({
   stripeService: {
     redirectToCheckout: jest.fn(),
   },

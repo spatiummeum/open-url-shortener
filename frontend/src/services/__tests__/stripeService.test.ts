@@ -6,6 +6,19 @@ import axios from 'axios';
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
+// Mock apiService
+jest.mock('../apiService', () => ({
+  apiService: {
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    delete: jest.fn(),
+  }
+}));
+
+import { apiService } from '../apiService';
+const mockApiService = apiService as jest.Mocked<typeof apiService>;
+
 // Mock window.location
 const mockLocation = {
   href: '',
@@ -43,11 +56,11 @@ describe('StripeService', () => {
         publishableKey: 'pk_test_123',
       };
 
-      mockedAxios.get.mockResolvedValue({ data: mockConfig });
+      mockApiService.get.mockResolvedValue(mockConfig);
 
       const result = await stripeService.getConfig();
 
-      expect(mockedAxios.get).toHaveBeenCalledWith('http://localhost:3001/api/stripe/config');
+      expect(mockApiService.get).toHaveBeenCalledWith('/stripe/config');
       expect(result).toEqual(mockConfig);
     });
 
@@ -59,40 +72,40 @@ describe('StripeService', () => {
         },
       };
 
-      mockedAxios.get.mockResolvedValue({ data: mockConfig });
+      mockApiService.get.mockResolvedValue(mockConfig);
 
       await stripeService.getConfig();
 
-      expect(mockedAxios.get).toHaveBeenCalledWith('http://localhost:3001/api/stripe/config');
+      expect(mockApiService.get).toHaveBeenCalledWith('/stripe/config');
     });
   });
 
   describe('createCustomer', () => {
     it('should create Stripe customer', async () => {
       const mockCustomer: StripeCustomer = { id: 'cus_123' };
-      mockedAxios.post.mockResolvedValue({ data: { customer: mockCustomer } });
+      mockApiService.post.mockResolvedValue({ customer: mockCustomer });
 
       const result = await stripeService.createCustomer();
 
-      expect(mockedAxios.post).toHaveBeenCalledWith('http://localhost:3001/api/stripe/customer', {}, undefined);
+      expect(mockApiService.post).toHaveBeenCalledWith('/stripe/customer', {}, undefined);
       expect(result).toEqual(mockCustomer);
     });
 
     it('should pass axios config to createCustomer', async () => {
       const mockCustomer: StripeCustomer = { id: 'cus_123' };
       const config = { headers: { Authorization: 'Bearer token' } };
-      mockedAxios.post.mockResolvedValue({ data: { customer: mockCustomer } });
+      mockApiService.post.mockResolvedValue({ customer: mockCustomer });
 
       await stripeService.createCustomer(config);
 
-      expect(mockedAxios.post).toHaveBeenCalledWith('http://localhost:3001/api/stripe/customer', {}, config);
+      expect(mockApiService.post).toHaveBeenCalledWith('/stripe/customer', {}, config);
     });
   });
 
   describe('createCheckoutSession', () => {
     it('should create checkout session', async () => {
       const mockSession: CheckoutSession = { url: 'https://checkout.stripe.com/session_123' };
-      mockedAxios.post.mockResolvedValue({ data: mockSession });
+      mockApiService.post.mockResolvedValue(mockSession);
 
       const result = await stripeService.createCheckoutSession(
         'price_123',
@@ -100,8 +113,8 @@ describe('StripeService', () => {
         'https://cancel.com'
       );
 
-      expect(mockedAxios.post).toHaveBeenCalledWith(
-        'http://localhost:3001/api/stripe/checkout',
+      expect(mockApiService.post).toHaveBeenCalledWith(
+        '/stripe/checkout',
         {
           priceId: 'price_123',
           successUrl: 'https://success.com',
@@ -115,7 +128,7 @@ describe('StripeService', () => {
     it('should pass axios config to createCheckoutSession', async () => {
       const mockSession: CheckoutSession = { url: 'https://checkout.stripe.com/session_123' };
       const config = { headers: { Authorization: 'Bearer token' } };
-      mockedAxios.post.mockResolvedValue({ data: mockSession });
+      mockApiService.post.mockResolvedValue(mockSession);
 
       await stripeService.createCheckoutSession(
         'price_123',
@@ -124,8 +137,8 @@ describe('StripeService', () => {
         config
       );
 
-      expect(mockedAxios.post).toHaveBeenCalledWith(
-        'http://localhost:3001/api/stripe/checkout',
+      expect(mockApiService.post).toHaveBeenCalledWith(
+        '/stripe/checkout',
         {
           priceId: 'price_123',
           successUrl: 'https://success.com',
@@ -146,16 +159,16 @@ describe('StripeService', () => {
         stripeSubscriptionId: 'sub_123',
       };
 
-      mockedAxios.get.mockResolvedValue({ data: { subscription: mockSubscription } });
+      mockApiService.get.mockResolvedValue({ subscription: mockSubscription });
 
       const result = await stripeService.getSubscription();
 
-      expect(mockedAxios.get).toHaveBeenCalledWith('http://localhost:3001/api/stripe/subscription', undefined);
+      expect(mockApiService.get).toHaveBeenCalledWith('/stripe/subscription', undefined);
       expect(result).toEqual(mockSubscription);
     });
 
     it('should handle null subscription', async () => {
-      mockedAxios.get.mockResolvedValue({ data: { subscription: null } });
+      mockApiService.get.mockResolvedValue({ subscription: null });
 
       const result = await stripeService.getSubscription();
 
@@ -164,11 +177,11 @@ describe('StripeService', () => {
 
     it('should pass axios config to getSubscription', async () => {
       const config = { headers: { Authorization: 'Bearer token' } };
-      mockedAxios.get.mockResolvedValue({ data: { subscription: null } });
+      mockApiService.get.mockResolvedValue({ subscription: null });
 
       await stripeService.getSubscription(config);
 
-      expect(mockedAxios.get).toHaveBeenCalledWith('http://localhost:3001/api/stripe/subscription', config);
+      expect(mockApiService.get).toHaveBeenCalledWith('/stripe/subscription', config);
     });
   });
 
@@ -182,14 +195,14 @@ describe('StripeService', () => {
       };
       const mockSession: CheckoutSession = { url: 'https://checkout.stripe.com/session_123' };
 
-      mockedAxios.get.mockResolvedValue({ data: mockConfig });
-      mockedAxios.post.mockResolvedValue({ data: mockSession });
+      mockApiService.get.mockResolvedValue(mockConfig);
+      mockApiService.post.mockResolvedValue(mockSession);
 
       await stripeService.redirectToCheckout('pro');
 
-      expect(mockedAxios.get).toHaveBeenCalledWith('http://localhost:3001/api/stripe/config');
-      expect(mockedAxios.post).toHaveBeenCalledWith(
-        'http://localhost:3001/api/stripe/checkout',
+      expect(mockApiService.get).toHaveBeenCalledWith('/stripe/config');
+      expect(mockApiService.post).toHaveBeenCalledWith(
+        '/stripe/checkout',
         {
           priceId: 'price_pro123',
           successUrl: 'http://localhost:3000/dashboard?payment=success',
@@ -209,13 +222,13 @@ describe('StripeService', () => {
       };
       const mockSession: CheckoutSession = { url: 'https://checkout.stripe.com/session_456' };
 
-      mockedAxios.get.mockResolvedValue({ data: mockConfig });
-      mockedAxios.post.mockResolvedValue({ data: mockSession });
+      mockApiService.get.mockResolvedValue(mockConfig);
+      mockApiService.post.mockResolvedValue(mockSession);
 
       await stripeService.redirectToCheckout('enterprise');
 
-      expect(mockedAxios.post).toHaveBeenCalledWith(
-        'http://localhost:3001/api/stripe/checkout',
+      expect(mockApiService.post).toHaveBeenCalledWith(
+        '/stripe/checkout',
         expect.objectContaining({
           priceId: 'price_ent123',
         }),
@@ -233,8 +246,8 @@ describe('StripeService', () => {
       };
       const mockSession: CheckoutSession = { url: 'https://checkout.stripe.com/session_123' };
 
-      mockedAxios.get.mockResolvedValue({ data: mockConfig });
-      mockedAxios.post.mockResolvedValue({ data: mockSession });
+      mockApiService.get.mockResolvedValue(mockConfig);
+      mockApiService.post.mockResolvedValue(mockSession);
 
       await stripeService.redirectToCheckout(
         'pro',
@@ -242,8 +255,8 @@ describe('StripeService', () => {
         'https://custom-cancel.com'
       );
 
-      expect(mockedAxios.post).toHaveBeenCalledWith(
-        'http://localhost:3001/api/stripe/checkout',
+      expect(mockApiService.post).toHaveBeenCalledWith(
+        '/stripe/checkout',
         {
           priceId: 'price_pro123',
           successUrl: 'https://custom-success.com',
@@ -261,7 +274,7 @@ describe('StripeService', () => {
         },
       };
 
-      mockedAxios.get.mockResolvedValue({ data: mockConfig });
+      mockApiService.get.mockResolvedValue(mockConfig);
 
       await expect(
         stripeService.redirectToCheckout('invalid' as any)
@@ -276,8 +289,8 @@ describe('StripeService', () => {
         },
       };
 
-      mockedAxios.get.mockResolvedValue({ data: mockConfig });
-      mockedAxios.post.mockResolvedValue({ data: { url: null } });
+      mockApiService.get.mockResolvedValue(mockConfig);
+      mockApiService.post.mockResolvedValue({ url: null });
 
       await expect(
         stripeService.redirectToCheckout('pro')
@@ -285,7 +298,7 @@ describe('StripeService', () => {
     });
 
     it('should handle network errors', async () => {
-      mockedAxios.get.mockRejectedValue(new Error('Network error'));
+      mockApiService.get.mockRejectedValue(new Error('Network error'));
 
       await expect(
         stripeService.redirectToCheckout('pro')
@@ -302,13 +315,13 @@ describe('StripeService', () => {
       const mockSession: CheckoutSession = { url: 'https://checkout.stripe.com/session_123' };
       const config = { headers: { Authorization: 'Bearer token' } };
 
-      mockedAxios.get.mockResolvedValue({ data: mockConfig });
-      mockedAxios.post.mockResolvedValue({ data: mockSession });
+      mockApiService.get.mockResolvedValue(mockConfig);
+      mockApiService.post.mockResolvedValue(mockSession);
 
       await stripeService.redirectToCheckout('pro', undefined, undefined, config);
 
-      expect(mockedAxios.post).toHaveBeenCalledWith(
-        'http://localhost:3001/api/stripe/checkout',
+      expect(mockApiService.post).toHaveBeenCalledWith(
+        '/stripe/checkout',
         expect.any(Object),
         config
       );

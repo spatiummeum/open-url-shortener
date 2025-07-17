@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuthStore } from '../../store/authStore';
-import { useStripeSubscription } from '../../hooks/useStripeSubscription';
+import { useAuthStore } from '@/store/authStore';
+import { useStripeSubscription } from '@/hooks/useStripeSubscription';
 
 export interface DashboardHeaderProps {
   title: string;

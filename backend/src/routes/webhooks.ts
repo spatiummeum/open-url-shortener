@@ -19,7 +19,7 @@ router.post('/stripe', express.raw({ type: 'application/json' }), async (req, re
   
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, { 
-      apiVersion: '2024-06-20' 
+      apiVersion: '2025-06-30.basil' 
     });
     
     event = stripe.webhooks.constructEvent(

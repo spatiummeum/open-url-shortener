@@ -15,13 +15,18 @@ const customJestConfig = {
   
   testEnvironment: 'jest-environment-jsdom',
   
-  // Handle module aliases
+  // Handle module aliases and static assets
   moduleNameMapper: {
+    // Module aliases
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@/components/(.*)$': '<rootDir>/src/components/$1',
     '^@/services/(.*)$': '<rootDir>/src/services/$1',
     '^@/hooks/(.*)$': '<rootDir>/src/hooks/$1',
     '^@/types$': '<rootDir>/src/types',
+    // Static assets
+    '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
+    '^.+\\.(css|sass|scss)$': 'identity-obj-proxy',
+    '^.+\\.(png|jpg|jpeg|gif|webp|avif|ico|bmp|svg)$/i': '<rootDir>/__mocks__/fileMock.js',
   },
   
   // Transform files
@@ -34,13 +39,6 @@ const customJestConfig = {
     '/node_modules/',
     '^.+\\.module\\.(css|sass|scss)$',
   ],
-  
-  // Handle static assets
-  moduleNameMapper: {
-    '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
-    '^.+\\.(css|sass|scss)$': 'identity-obj-proxy',
-    '^.+\\.(png|jpg|jpeg|gif|webp|avif|ico|bmp|svg)$/i': '<rootDir>/__mocks__/fileMock.js',
-  },
   
   // Test match patterns
   testMatch: [

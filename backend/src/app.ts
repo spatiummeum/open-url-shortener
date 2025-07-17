@@ -23,7 +23,19 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(helmet({
-  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      fontSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https:"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
+    }
+  } : false,
 }));
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -58,8 +70,8 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// 404 handler
-app.use('*', (req: express.Request, res: express.Response) => {
+// 404 handler - Express 5 compatible
+app.use((req: express.Request, res: express.Response) => {
   res.status(404).json({
     error: 'Not found'
   });

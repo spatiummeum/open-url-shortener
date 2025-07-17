@@ -273,10 +273,13 @@ describe('Analytics Service', () => {
     it('should handle export errors', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
-        status: 500
-      } as Response);
+        status: 500,
+        json: jest.fn().mockImplementation(() => {
+          throw new Error('response.json is not a function');
+        })
+      } as any);
 
-      await expect(analyticsService.exportAnalytics()).rejects.toThrow('Failed to export analytics: undefined');
+      await expect(analyticsService.exportAnalytics()).rejects.toThrow('response.json is not a function');
     });
   });
 

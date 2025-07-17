@@ -52,17 +52,22 @@ jest.mock('../../middleware/auth', () => ({
 import app from '../../app';
 import { PrismaClient } from '@prisma/client';
 
-// Mock Prisma
-jest.mock('@prisma/client');
-const mockPrisma = {
-  subscription: {
-    findUnique: jest.fn(),
-    create: jest.fn(),
+// Mock Prisma - define before use
+jest.mock('../../utils/database', () => ({
+  prisma: {
+    subscription: {
+      findUnique: jest.fn(),
+      create: jest.fn(),
+    },
+    user: {
+      findUnique: jest.fn(),
+    },
   },
-  user: {
-    findUnique: jest.fn(),
-  },
-} as any;
+}));
+
+jest.mock('@prisma/client', () => ({
+  PrismaClient: jest.fn(),
+}));
 
 // Mock Stripe service
 jest.mock('../../services/stripeService', () => ({
@@ -71,11 +76,16 @@ jest.mock('../../services/stripeService', () => ({
 }));
 
 import { createCustomer, createCheckoutSession } from '../../services/stripeService';
+import { prisma } from '../../utils/database';
 
 describe('Stripe Routes', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (PrismaClient as jest.MockedClass<typeof PrismaClient>).mockImplementation(() => mockPrisma);
+    
+    // Set up environment variables
+    process.env.STRIPE_PUBLISHABLE_KEY = 'pk_test_mock_key';
+    process.env.STRIPE_PRICE_ID_PRO = 'price_pro_test';
+    process.env.STRIPE_PRICE_ID_ENTERPRISE = 'price_enterprise_test';
   });
 
   describe('GET /api/stripe/config', () => {
@@ -94,7 +104,7 @@ describe('Stripe Routes', () => {
   describe('POST /api/stripe/customer', () => {
     it('should create a new customer', async () => {
       const mockCustomer = { id: 'cus_123' };
-      mockPrisma.subscription.findUnique.mockResolvedValue(null);
+      (prisma.subscription.findUnique as jest.Mock).mockResolvedValue(null);
       (createCustomer as jest.MockedFunction<typeof createCustomer>)
         .mockResolvedValue(mockCustomer as any);
 
@@ -108,7 +118,7 @@ describe('Stripe Routes', () => {
 
     it('should return existing customer if subscription exists', async () => {
       const mockSubscription = { stripeCustomerId: 'cus_existing' };
-      mockPrisma.subscription.findUnique.mockResolvedValue(mockSubscription);
+      (prisma.subscription.findUnique as jest.Mock).mockResolvedValue(mockSubscription);
 
       const response = await request(app)
         .post('/api/stripe/customer')
@@ -191,14 +201,20 @@ describe('Stripe Routes', () => {
         cancelAtPeriodEnd: false,
         stripeSubscriptionId: 'sub_123',
       };
-      mockPrisma.subscription.findUnique.mockResolvedValue(mockSubscription);
+      (prisma.subscription.findUnique as jest.Mock).mockResolvedValue(mockSubscription);
 
       const response = await request(app)
         .get('/api/stripe/subscription')
         .expect(200);
 
-      expect(response.body).toEqual({ subscription: mockSubscription });
-      expect(mockPrisma.subscription.findUnique).toHaveBeenCalledWith({
+      expect(response.body).toEqual({ 
+        subscription: {
+          ...mockSubscription,
+          currentPeriodStart: mockSubscription.currentPeriodStart.toISOString(),
+          currentPeriodEnd: mockSubscription.currentPeriodEnd.toISOString(),
+        }
+      });
+      expect(prisma.subscription.findUnique).toHaveBeenCalledWith({
         where: { userId: 'user_123' },
         select: {
           plan: true,
@@ -212,7 +228,7 @@ describe('Stripe Routes', () => {
     });
 
     it('should return null for non-existent subscription', async () => {
-      mockPrisma.subscription.findUnique.mockResolvedValue(null);
+      (prisma.subscription.findUnique as jest.Mock).mockResolvedValue(null);
 
       const response = await request(app)
         .get('/api/stripe/subscription')

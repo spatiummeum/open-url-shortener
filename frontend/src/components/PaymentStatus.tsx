@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { stripeService } from '../services/stripeService';
+import { stripeService } from '@/services/stripeService';
 
 interface PaymentStatusProps {
   onClose?: () => void;

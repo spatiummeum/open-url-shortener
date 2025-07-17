@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { stripeService } from '../services/stripeService';
-import type { Subscription } from '../services/stripeService';
+import { stripeService } from '@/services/stripeService';
+import type { Subscription } from '@/services/stripeService';
 
 interface PricingCardProps {
   title: string;
