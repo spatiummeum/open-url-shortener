@@ -23,7 +23,7 @@ export default function QuickActions({ actions }: QuickActionsProps) {
     {
       title: 'Create Short URL',
       description: 'Generate a new short link',
-      href: '/dashboard/urls/new',
+      href: '/urls/new',
       color: 'text-blue-600 bg-blue-50 hover:bg-blue-100',
       icon: (
         <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

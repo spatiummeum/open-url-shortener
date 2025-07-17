@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { useStripeSubscription } from '@/hooks/useStripeSubscription';
 
@@ -157,15 +158,15 @@ export default function DashboardHeader({
 
             {/* Quick actions dropdown */}
             <div className="relative">
-              <button
-                type="button"
+              <Link
+                href="/urls/new"
                 className="inline-flex items-center px-6 py-3 glass-modern rounded-xl shadow-soft text-sm font-medium text-gray-700 backdrop-blur-sm border border-white/30 hover:bg-white/80 focus-ring-modern transition-all duration-300 hover-scale"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
                 New URL
-              </button>
+              </Link>
             </div>
           </div>
         </div>
