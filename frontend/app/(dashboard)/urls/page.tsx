@@ -2,11 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import DashboardHeader from '../../../src/components/dashboard/DashboardHeader';
 import { apiService } from '../../../src/services/apiService';
+import { useAuthStore } from '../../../src/store/authStore';
 import { Url } from '../../../src/types';
 
 export default function UrlsPage() {
+  const router = useRouter();
+  const { isAuthenticated, checkAuth } = useAuthStore();
   const [urls, setUrls] = useState<Url[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -16,14 +20,23 @@ export default function UrlsPage() {
   const [selectedUrls, setSelectedUrls] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchUrls();
-  }, [sortBy, sortOrder]);
+    const initAuth = async () => {
+      const authSuccess = await checkAuth();
+      if (!authSuccess) {
+        router.push('/login');
+        return;
+      }
+      fetchUrls();
+    };
+    
+    initAuth();
+  }, []);
 
   const fetchUrls = async () => {
     try {
       setLoading(true);
-      const data = await apiService.get(`/urls?sort=${sortBy}&order=${sortOrder}`);
-      setUrls(data.urls || data);
+      const data = await apiService.get('/urls');
+      setUrls(data.urls || []);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to load URLs');
     } finally {
@@ -166,7 +179,7 @@ export default function UrlsPage() {
                 )}
                 
                 <Link
-                  href="/dashboard/urls/new"
+                  href="/urls/new"
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   <svg className="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -194,7 +207,7 @@ export default function UrlsPage() {
                 {!searchTerm && (
                   <div className="mt-6">
                     <Link
-                      href="/dashboard/urls/new"
+                      href="/urls/new"
                       className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                       <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -250,7 +263,7 @@ export default function UrlsPage() {
                           <div className="flex flex-col">
                             <div className="flex items-center space-x-2 mb-1">
                               <button
-                                onClick={() => copyToClipboard(url.shortUrl || `https://short.ly/${url.shortCode}`)}
+                                onClick={() => copyToClipboard((url as any).shortUrl || `http://localhost:3002/${url.shortCode}`)}
                                 className="text-sm font-medium text-blue-600 hover:text-blue-500 flex items-center"
                               >
                                 {url.shortCode}
@@ -272,10 +285,10 @@ export default function UrlsPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <Link
-                            href={`/dashboard/analytics/urls/${url.shortCode}`}
+                            href={`/analytics/${url.id}`}
                             className="text-sm font-medium text-gray-900 hover:text-blue-600"
                           >
-                            0 {/* We'll get this from analytics later */}
+                            {(url as any).clickCount || (url as any)._count?.clicks || 0}
                           </Link>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

@@ -513,4 +513,45 @@ router.post('/reset-password',
   }
 );
 
+/**
+ * Get current user profile
+ * GET /auth/me
+ */
+router.get('/me',
+  requireAuth,
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const userId = req.user!.id;
+      
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          plan: true,
+          isActive: true,
+          isVerified: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      });
+
+      if (!user) {
+        res.status(HTTP_STATUS.NOT_FOUND).json({
+          error: 'User not found'
+        });
+        return;
+      }
+
+      res.json({ user });
+    } catch (error) {
+      console.error('Get profile error:', error);
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+        error: 'Internal server error'
+      });
+    }
+  }
+);
+
 export default router;

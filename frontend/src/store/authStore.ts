@@ -63,8 +63,7 @@ export const useAuthStore = create<AuthStore>()(
           }
 
           const data = await response.json();
-          const { user, accessToken, refreshToken } = data;
-          const tokens = { accessToken, refreshToken };
+          const { user, tokens } = data;
 
           set({
             user,
@@ -106,15 +105,15 @@ export const useAuthStore = create<AuthStore>()(
         }
 
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
             headers: {
               'Authorization': `Bearer ${tokens.accessToken}`,
             },
           });
 
           if (response.ok) {
-            const user = await response.json();
-            set({ user, isAuthenticated: true });
+            const data = await response.json();
+            set({ user: data.user, isAuthenticated: true });
             return true;
           } else {
             // Token might be expired, try to refresh
@@ -128,20 +127,20 @@ export const useAuthStore = create<AuthStore>()(
               });
 
               if (refreshResponse.ok) {
-                const { accessToken, refreshToken } = await refreshResponse.json();
-                const newTokens = { accessToken, refreshToken };
+                const data = await refreshResponse.json();
+                const newTokens = { accessToken: data.accessToken, refreshToken: data.refreshToken };
                 set({ tokens: newTokens });
 
                 // Try to get user profile again with new token
-                const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile`, {
+                const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
                   headers: {
-                    'Authorization': `Bearer ${accessToken}`,
+                    'Authorization': `Bearer ${newTokens.accessToken}`,
                   },
                 });
 
                 if (userResponse.ok) {
-                  const user = await userResponse.json();
-                  set({ user, isAuthenticated: true });
+                  const userData = await userResponse.json();
+                  set({ user: userData.user, isAuthenticated: true });
                   return true;
                 }
               }

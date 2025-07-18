@@ -1,15 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import DashboardHeader from '../../../../src/components/dashboard/DashboardHeader';
 import UrlForm from '../../../../src/components/UrlForm';
 import { apiService } from '../../../../src/services/apiService';
+import { useAuthStore } from '../../../../src/store/authStore';
 
 export default function NewUrlPage() {
   const router = useRouter();
+  const { checkAuth } = useAuthStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const authSuccess = await checkAuth();
+      if (!authSuccess) {
+        router.push('/login');
+        return;
+      }
+      setLoading(false);
+    };
+    
+    initAuth();
+  }, []);
 
   const handleSubmit = async (formData: {
     originalUrl: string;
@@ -26,13 +42,29 @@ export default function NewUrlPage() {
       const response = await apiService.post('/urls', formData);
       
       // Redirect to the URLs page with success message
-      router.push('/dashboard/urls?created=true');
+      router.push('/urls?created=true');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to create URL');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <DashboardHeader 
+          title="Create New URL" 
+          subtitle="Shorten a new URL and customize its settings" 
+        />
+        <div className="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -100,7 +132,7 @@ export default function NewUrlPage() {
               <UrlForm 
                 onSuccess={(result) => {
                   // Redirect to the URLs page with success message
-                  router.push('/dashboard/urls?created=true');
+                  router.push('/urls?created=true');
                 }}
                 className=""
               />
@@ -141,7 +173,7 @@ export default function NewUrlPage() {
             </button>
             
             <button
-              onClick={() => router.push('/dashboard/urls')}
+              onClick={() => router.push('/urls')}
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               View All URLs
