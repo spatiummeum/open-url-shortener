@@ -162,7 +162,7 @@ router.post('/',
 
       res.status(HTTP_STATUS.CREATED).json({
         ...url,
-        shortUrl: `${process.env.BASE_URL || 'http://localhost:3001'}/${url.shortCode}`,
+        shortUrl: `${process.env.BASE_URL || 'http://localhost:3002'}/${url.shortCode}`,
         hasPassword: !!hashedPassword
       });
 
@@ -234,7 +234,7 @@ router.get('/',
       res.json({
         urls: urls.map((url: any) => ({
           ...url,
-          shortUrl: `${process.env.BASE_URL || 'http://localhost:3001'}/${url.shortCode}`,
+          shortUrl: `${process.env.BASE_URL || 'http://localhost:3002'}/${url.shortCode}`,
           clickCount: url._count.clicks
         })),
         pagination: {
@@ -296,7 +296,7 @@ router.get('/:id',
 
       res.json({
         ...url,
-        shortUrl: `${process.env.BASE_URL || 'http://localhost:3001'}/${url.shortCode}`,
+        shortUrl: `${process.env.BASE_URL || 'http://localhost:3002'}/${url.shortCode}`,
         clickCount: url._count.clicks
       });
 
@@ -358,7 +358,7 @@ router.put('/:id',
 
       res.json({
         ...updatedUrl,
-        shortUrl: `${process.env.BASE_URL || 'http://localhost:3001'}/${updatedUrl.shortCode}`
+        shortUrl: `${process.env.BASE_URL || 'http://localhost:3002'}/${updatedUrl.shortCode}`
       });
 
     } catch (error) {

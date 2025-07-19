@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useStripeSubscription } from '@/hooks/useStripeSubscription';
 
@@ -16,9 +17,15 @@ export default function DashboardHeader({
   subtitle, 
   showSubscriptionStatus = true 
 }: DashboardHeaderProps) {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const { subscription, loading } = useStripeSubscription();
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
 
   const getPlanBadge = () => {
     if (loading) {
@@ -156,8 +163,8 @@ export default function DashboardHeader({
               </button>
             )}
 
-            {/* Quick actions dropdown */}
-            <div className="relative">
+            {/* Quick actions */}
+            <div className="flex items-center space-x-3">
               <Link
                 href="/urls/new"
                 className="inline-flex items-center px-6 py-3 glass-modern rounded-xl shadow-soft text-sm font-medium text-gray-700 backdrop-blur-sm border border-white/30 hover:bg-white/80 focus-ring-modern transition-all duration-300 hover-scale"
@@ -167,6 +174,17 @@ export default function DashboardHeader({
                 </svg>
                 New URL
               </Link>
+              
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center px-4 py-3 glass-modern rounded-xl shadow-soft text-sm font-medium text-gray-700 backdrop-blur-sm border border-white/30 hover:bg-red-50/80 hover:text-red-700 hover:border-red-200/50 focus-ring-modern transition-all duration-300 hover-scale"
+                title="Sign out"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span className="ml-2 hidden sm:block">Sign out</span>
+              </button>
             </div>
           </div>
         </div>

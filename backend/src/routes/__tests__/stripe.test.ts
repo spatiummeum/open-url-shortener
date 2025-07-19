@@ -11,12 +11,30 @@ jest.mock('../../middleware/rateLimiter', () => ({
   rateLimitRedirect: (req: any, res: any, next: any) => next(),
 }));
 
-jest.mock('express-validator', () => ({
-  validationResult: jest.fn().mockReturnValue({
-    isEmpty: () => true,
-    array: () => []
-  }),
-}));
+jest.mock('express-validator', () => {
+  const mockValidationChain = (req: any, res: any, next: any) => next();
+  
+  // Add all the chaining methods to the mock
+  Object.assign(mockValidationChain, {
+    optional: jest.fn().mockReturnValue(mockValidationChain),
+    notEmpty: jest.fn().mockReturnValue(mockValidationChain),
+    isLength: jest.fn().mockReturnValue(mockValidationChain),
+    isEmail: jest.fn().mockReturnValue(mockValidationChain),
+    matches: jest.fn().mockReturnValue(mockValidationChain),
+    equals: jest.fn().mockReturnValue(mockValidationChain),
+    withMessage: jest.fn().mockReturnValue(mockValidationChain),
+    trim: jest.fn().mockReturnValue(mockValidationChain),
+    normalizeEmail: jest.fn().mockReturnValue(mockValidationChain),
+  });
+
+  return {
+    body: jest.fn(() => mockValidationChain),
+    validationResult: jest.fn().mockReturnValue({
+      isEmpty: () => true,
+      array: () => []
+    }),
+  };
+});
 
 jest.mock('../../middleware/validation', () => {
   const mockValidationChain = (req: any, res: any, next: any) => next();
